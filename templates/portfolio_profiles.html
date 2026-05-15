@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{# ========================================================= #}
+{# PAGE TITLE                                                #}
+{# This title appears in the browser tab                     #}
+{# ========================================================= #}
+
+{% block title %}
+Portfolio Profiles | PostgreSQL Portfolio App
+{% endblock %}
+
+{# ========================================================= #}
+{# MAIN PAGE CONTENT                                         #}
+{# Everything inside this block is inserted into base.html   #}
+{# ========================================================= #}
+
+{% block content %}
+
+<!-- ====================================================== -->
+<!-- PAGE INTRODUCTION CARD                                 -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+    <h1>Portfolio Profiles and Database-Backed Mandates</h1>
+
+    <p>
+        This page displays portfolio mandates stored inside the PostgreSQL database
+        using the Flask-SQLAlchemy Portfolio model.
+    </p>
+
+    <p>
+        Each portfolio includes mandate information, compliance data,
+        investment objectives, constraints, and saved portfolio holdings.
+    </p>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LOOP THROUGH ALL PORTFOLIOS                            -->
+<!-- Each portfolio returned from Flask is rendered below   -->
+<!-- ====================================================== -->
+
+{% for portfolio in portfolios %}
+
+    {% set profile = portfolio.profile_data %}
+
+    <!-- ================================================== -->
+    <!-- INDIVIDUAL PORTFOLIO CARD                          -->
+    <!-- ================================================== -->
+
+    <div class="card">
+
+        <!-- ============================================== -->
+        <!-- PORTFOLIO HEADER INFORMATION                   -->
+        <!-- ============================================== -->
+
+        <h2>{{ portfolio.display_name }}</h2>
+
+        <p>
+            <strong>Portfolio Key:</strong>
+            {{ portfolio.key }}
+        </p>
+
+        <p>
+            <strong>Client ID:</strong>
+            {{ portfolio.client_id }}
+        </p>
+
+        <p>
+            <strong>Reference Ticker / Benchmark Anchor:</strong>
+            {{ portfolio.benchmark_ticker }}
+        </p>
+
+        <p>
+            <strong>Portfolio Value:</strong>
+            {{ "{:,.0f}".format(portfolio.portfolio_value) }}
+        </p>
+
+        <!-- ============================================== -->
+        <!-- PORTFOLIO SUMMARY GRID                         -->
+        <!-- ============================================== -->
+
+        <div class="portfolio-summary">
+
+            <div>
+                <p><strong>Objective</strong></p>
+                <p>{{ profile.objectives.goals }}</p>
+            </div>
+
+            <div>
+                <p><strong>Risk Profile</strong></p>
+                <p>
+                    {{ profile.risk_profile.risk_tolerance }}
+                    /
+                    {{ profile.risk_profile.risk_capacity }}
+                </p>
+            </div>
+
+            <div>
+                <p><strong>Max Drawdown</strong></p>
+                <p>{{ profile.risk_profile.max_drawdown_percent }}%</p>
+            </div>
+
+            <div>
+                <p><strong>Max Position Weight</strong></p>
+                <p>{{ portfolio.max_weight }}%</p>
+            </div>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- IDENTITY AND ACCOUNT CONTROL                   -->
+        <!-- ============================================== -->
+
+        <button class="accordion" type="button">
+            Identity and Account Control
+        </button>
+
+        <div class="panel">
+
+            <ul>
+
+                {% for field, value in profile.identity.items() %}
+
+                    <li>
+                        <strong>
+                            {{ field.replace('_', ' ').title() }}:
+                        </strong>
+
+                        {# ------------------------------------- #}
+                        {# Strings display normally              #}
+                        {# Lists/tuples display joined           #}
+                        {# Numbers/booleans display normally     #}
+                        {# ------------------------------------- #}
+
+                        {% if value is string %}
+                            {{ value }}
+                        {% elif value is iterable %}
+                            {{ value | join(', ') }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- COMPLIANCE REVIEW                              -->
+        <!-- ============================================== -->
+
+        <button class="accordion" type="button">
+            Compliance Review
+        </button>
+
+        <div class="panel">
+
+            <ul>
+
+                {% for field, value in profile.compliance.items() %}
+
+                    <li>
+                        <strong>
+                            {{ field.replace('_', ' ').title() }}:
+                        </strong>
+
+                        {% if value is string %}
+                            {{ value }}
+                        {% elif value is iterable %}
+                            {{ value | join(', ') }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MANDATE CONSTRAINTS                            -->
+        <!-- ============================================== -->
+
+        <button class="accordion" type="button">
+            Mandate Constraints
+        </button>
+
+        <div class="panel">
+
+            <ul>
+
+                {% for field, value in profile.constraints.items() %}
+
+                    <li>
+                        <strong>
+                            {{ field.replace('_', ' ').title() }}:
+                        </strong>
+
+                        {% if value is string %}
+                            {{ value }}
+                        {% elif value is iterable %}
+                            {{ value | join(', ') }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- DATABASE RELATIONSHIP SECTION                  -->
+        <!-- Demonstrates SQLAlchemy relationship usage     -->
+        <!-- ============================================== -->
+
+        <button class="accordion" type="button">
+            Saved Holdings Relationship
+        </button>
+
+        <div class="panel">
+
+            <p>
+                This portfolio currently has
+                <strong>{{ portfolio.holdings | length }}</strong>
+                saved holding(s) stored in the
+                <strong>PortfolioHolding</strong> database table.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endfor %}
+
+{% endblock %}

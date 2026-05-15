@@ -1,1 +1,6 @@
-python-3.11.6
+python-3.11.9
+# I use this file to tell Render or Heroku exactly which version of Python I want.
+# Without this, the server might try to use an old version that doesn't 
+# support my code features, which would cause the deployment to fail.
+
+python-3.11.9

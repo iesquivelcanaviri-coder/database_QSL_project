@@ -1,0 +1,441 @@
+/* ========================================================== */
+   /* 1. GLOBAL STYLES */ /* Section title showing that the rules below apply across the whole website and set the general visual foundation */
+   /* ========================================================== */ 
+
+* { /* Universal selector targets every element on the page, which is useful when you want one consistent rule applied everywhere */
+    box-sizing: border-box; /* Makes width and height calculations easier because padding and border are included inside the element's total size instead of being added on top */
+} 
+
+body { /* Targets the main page body element, so these styles become the default look and feel for the full website unless later rules override them */
+    font-family: Arial, sans-serif; /* Sets Arial as the main font and uses any available sans-serif font as a fallback if Arial is not available on the user's device */
+    background: #f4f6f9; /* Gives the whole page a light grey-blue background so the white cards stand out clearly from the page */
+    margin: 0; /* Removes the browser's default body margin so the layout starts flush and is easier to control manually */
+    padding: 0; /* Removes default inner spacing from the body for cleaner layout control */
+    color: #1a1a1a; /* Sets the default text colour to a dark grey so body text is readable without being harsh pure black */
+    line-height: 1.6; /* Increases vertical spacing between lines of text to improve readability, especially in paragraphs */
+} 
+
+h1, h2, h3, h4 { /* Groups heading selectors together so all main heading levels share the same base heading style */
+    color: #1a2b4c; /* Gives all headings a dark navy tone, which helps create a professional finance-themed visual identity */
+    margin-top: 0; /* Removes default top margin so headings inside cards do not create uneven spacing at the top */
+    margin-bottom: 0.75rem; /* Adds controlled spacing below headings so the text under each heading has breathing room */
+} 
+
+p { /* Targets all paragraph elements globally unless a more specific paragraph rule later overrides it */
+    margin-top: 0; /* Removes the browser's default paragraph top spacing so vertical layout is easier to control */
+    margin-bottom: 0.625rem; /* Adds consistent space below paragraphs so blocks of text do not look cramped */
+} 
+
+.container { /* Targets the main wrapper class used across pages to keep content centred and neatly constrained */
+    max-width: 75rem; /* Prevents the content from stretching too wide on large screens, which helps readability and visual balance */
+    margin: auto; /* Horizontally centres the container by giving equal left and right margins automatically */
+    padding: clamp(1rem, 3vw, 1.5rem); /* Adds internal spacing so page content does not sit directly against the browser edges */
+} 
+
+/* ========================================================== */
+   /* 2. NAVBAR */ /* Section title showing that the rules below style the navigation bar */
+   /* ========================================================== */
+
+.navbar { /* Targets the main navigation wrapper that holds the page links */
+    background: #1a2b4c; /* Gives the navbar a dark navy background so it visually stands apart from the rest of the page */
+    padding: 0.9375rem clamp(1rem, 4vw, 1.875rem); /* Adds vertical and horizontal spacing inside the navbar so the links do not touch the edges */
+    display: flex; /* Turns the navbar into a flex container so its child links can be aligned more easily in a row */
+    gap: clamp(1rem, 2.5vw, 1.875rem); /* Adds equal spacing between each navigation link without needing manual margins on each one */
+    align-items: center; /* Vertically aligns all navbar items in the middle of the flex row */
+    flex-wrap: wrap; /* Allows navbar items to move onto a new line if the screen becomes too narrow, improving responsiveness */
+    margin-bottom: 1.5rem; /* Adds space below the navbar so the next content block does not sit directly underneath it */
+    border-radius: 0.5rem; /* Rounds the corners of the navbar slightly to match the card style used elsewhere */
+} 
+
+.navbar a { /* Targets anchor links specifically inside the navbar */
+    color: white; /* Makes link text white so it contrasts clearly against the dark navy navbar background */
+    text-decoration: none; /* Removes the browser's default underline styling from links for a cleaner menu appearance */
+    font-weight: bold; /* Makes the link text bold so navigation options are visually stronger and easier to scan */
+    font-size: 1rem; /* Sets a readable font size for the navigation links */
+    padding-bottom: 0.25rem; /* Adds a little internal space at the bottom so the active underline has room to sit nicely */
+    transition: color 0.2s ease, border-color 0.2s ease; /* Smoothly animates colour and border changes when hover or active state changes happen */
+} 
+
+.navbar a:hover { /* Styles navbar links when the mouse pointer is placed over them */
+    color: #00d4ff; /* Changes link colour to bright cyan on hover to give the user a clear interactive visual cue */
+} 
+
+.navbar a.active { /* Styles the navigation link for the current page using the active class added by Jinja logic */
+    border-bottom: 0.125rem solid #00d4ff; /* Draws a cyan underline below the active page link so users can immediately see which page they are on */
+} 
+
+/* ========================================================== */ 
+   /* 3. ACCORDION / COLLAPSIBLE */ /* Section heading showing that the following rules style expandable content areas */
+   /* ========================================================== */
+
+.panel li { /* Targets each list item inside the panel */
+    margin-bottom: 0.375rem; /* Adds vertical space between list items to improve readability */
+} 
+
+.box { /* Targets the general "box" wrapper used for grouped content like position sizing rules */
+    border: 0.0625rem solid #d8dee8; /* Adds a subtle border around the box to separate it from the background */
+    background: white; /* Uses a white background so content stands out against the page background */
+    padding: 1.25rem; /* Adds inner spacing all around the content */
+    margin-bottom: 1.875rem; /* Adds spacing below the box before the next section */
+    border-radius: 0.5rem; /* Rounds box corners to match the site's card design */
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a very soft shadow to give the box a subtle lifted card effect */
+} 
+
+.collapsible-card { /* Targets the outer wrapper for the dark collapsible checklist section */
+    margin-bottom: 1rem; /* Adds spacing below this component using rem units so spacing scales with the root font size */
+    border-radius: 0.375rem; /* Rounds the edges of the collapsible card */
+    overflow: hidden; /* Ensures child content respects the rounded corners and nothing visually spills outside */
+    background: #11141a; /* Gives the card a dark background, creating contrast from the rest of the page */
+    border: 0.0625rem solid #2a2f38; /* Adds a subtle dark border so the edges are still visible against the dark background */
+} 
+
+.collapsible-btn { /* Styles the top button used to open and close the collapsible checklist */
+    width: 100%; /* Makes the button fill the full width of the card */
+    background: #1a1f27; /* Uses a dark background slightly lighter than the wrapper for layered depth */
+    color: #e5e7eb; /* Uses a light grey text colour so the label is readable against the dark background */
+    padding: 0.75rem 1rem; /* Adds comfortable internal spacing around the button text */
+    text-align: left; /* Aligns text to the left so it reads more like a header than a centered button */
+    font-size: 1.1rem; /* Sets font size slightly larger than normal text using rem units for scalable sizing */
+    border: none; /* Removes default browser button border */
+    cursor: pointer; /* Shows pointer cursor on hover to indicate interactivity */
+    outline: none; /* Removes the default focus outline, though ideally a custom focus style would be added for accessibility */
+} 
+
+.collapsible-btn:hover { /* Hover state for the collapsible button */
+    background: #232933; /* Slightly lightens the dark background to show hover interaction */
+} 
+
+.collapsible-content { /* Targets the hidden content area underneath the collapsible button */
+    display: none; /* Hides the collapsible content by default until JavaScript shows it */
+    padding: 0.75rem 1rem; /* Adds internal spacing so the content is readable */
+    background: #0d1015; /* Uses an even darker background than the button for a layered panel effect */
+    color: #cfd3e0; /* Uses a soft light text colour for readability on the dark background */
+} 
+
+.collapsible-content ul { /* Targets lists inside the collapsible content */
+    margin: 0; /* Removes default top and bottom list margins to keep spacing tight and controlled inside the card */
+    padding-left: 1.25rem; /* Adds standard left indentation so bullets are positioned normally */
+} 
+
+/* ========================================================== */ 
+   /* 4. FORMS */ /* Section title showing the next rules style form controls such as labels, inputs, and buttons */
+   /* ========================================================== */
+
+form { /* Targets all form elements on the site */
+    margin-bottom: 1.25rem; /* Adds spacing below forms so content after them does not sit too close */
+}
+
+form label { /* Targets labels inside forms */
+    display: block; /* Makes each label take its own line above its input instead of sitting inline */
+    font-weight: bold; /* Makes labels bold so field titles are easy to distinguish from input values */
+    margin-bottom: 0.5rem; /* Adds space between the label and the input element below it */
+}
+
+input[type="text"], /* Targets text inputs specifically */
+input[type="number"], /* Targets number inputs specifically */
+select { /* Targets all select dropdowns so they can share one consistent control style */
+    padding: 0.625rem 0.75rem; /* Adds internal spacing so typed text and selected values are comfortable to read */
+    width: 100%; /* Makes controls use the full available width of their container */
+    max-width: 26.25rem; /* Prevents controls from becoming too wide on large screens, which keeps forms visually tidy */
+    border: 0.0625rem solid #c7cfdb; /* Adds a soft grey border to define the edge of the control */
+    border-radius: 0.375rem; /* Rounds form controls slightly to match the design language of the rest of the site */
+    margin-bottom: 0.75rem; /* Adds vertical spacing under each control so stacked fields do not touch */
+    background: white; /* Gives controls a white background for contrast and clarity */
+    font-size: 0.9375rem; /* Sets a readable font size inside controls */
+}
+
+button { /* Styles all button elements globally unless more specific button styles override them */
+    padding: 0.625rem 1.125rem; /* Adds vertical and horizontal spacing inside buttons so they are easy to click and visually balanced */
+    background: #1a2b4c; /* Gives buttons the same dark navy brand colour used in headings and navbar */
+    color: white; /* Makes button text white so it contrasts clearly with the dark background */
+    border: none; /* Removes default browser button borders for a cleaner custom design */
+    border-radius: 0.375rem; /* Rounds button corners slightly */
+    cursor: pointer; /* Changes cursor to a pointer to show the button is clickable */
+    font-size: 0.9375rem; /* Sets readable text size inside buttons */
+    font-weight: bold; /* Makes button text bold so button labels stand out */
+    transition: background 0.2s ease; /* Smoothly animates background colour changes on hover */
+} 
+
+button:hover { /* Hover state for buttons */
+    background: #243a63; /* Slightly changes the button background to show hover interaction */
+} 
+
+/* ========================================================== */ 
+   /* 5. RESULT BOX */ /* Section title for the output area that displays analysis results */
+   /* ========================================================== */ 
+
+#result-box { /* Targets the element with id="result-box", which is the main analysis output container on the criteria page */
+    margin-top: 1.25rem; /* Adds spacing above the results box so it separates from the form above */
+    background: white; /* Gives the result area a white background to read like a separate card */
+    padding: 1.25rem; /* Adds inner spacing around all result content */
+    border-radius: 0.5rem; /* Rounds the result box corners */
+    border: 0.0625rem solid #d8dee8; /* Adds a subtle border so the box edge is visible */
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a soft shadow for depth and card-style presentation */
+} 
+
+#result-box h2 { /* Targets h2 headings inside the result box only */
+    margin-bottom: 1rem; /* Adds space below the main result heading */
+} 
+
+#result-box h3 { /* Targets h3 headings inside the result box only */
+    margin-top: 1.125rem; /* Adds spacing above subsection headings such as 1-year and 3-month analysis sections */
+    margin-bottom: 0.625rem; /* Adds spacing below subsection headings before the data lines begin */
+    padding-top: 0.5rem; /* Adds a little internal space above the text, helping visual separation from previous content */
+} 
+
+#result-box p { /* Targets paragraphs only inside the result box */
+    margin: 0.5rem 0; /* Uses vertical spacing only so each line of metric output has a clean consistent gap */
+    line-height: 1.4; /* Slightly increases line height for metric readability without making the layout too loose */
+} 
+
+#result-box span { /* Targets span elements inside the result box, which are usually the dynamic values filled in by JavaScript */
+    font-weight: normal; /* Prevents spans from inheriting unwanted bold weight when placed after strong labels */
+    color: #243a63; /* Gives dynamic result values a navy tone so they stand out visually from their labels */
+} 
+
+#result-box hr { /* Targets horizontal rule elements inside the result box */
+    margin: 1.25rem 0; /* Adds vertical spacing above and below the divider line */
+    border: none; /* Removes default browser hr styling */
+    border-top: 0.0625rem solid #dde3eb; /* Replaces it with a subtle custom top border for cleaner section separation */
+} 
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.results-column {
+    background: #ffffff;
+    padding: 0.9375rem;
+    border: 0.0625rem solid #dde3eb;
+    border-radius: 0.5rem;
+}
+
+.trade-message {
+    margin-top: 1rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: 0.375rem;
+    min-height: 1.375rem;
+    font-size: 0.875rem;
+}
+
+.trade-message { /* Targets the message area used to show info, success, or error feedback to the user */
+    margin-top: 1rem; /* Adds spacing above the message so it does not touch the previous element */
+    padding: 0.75rem 0.875rem; /* Adds comfortable spacing inside the message box */
+    border-radius: 0.375rem; /* Rounds message box corners */
+    min-height: 1.375rem; /* Ensures the box keeps a small visible height even if it is empty or has short content */
+    font-size: 0.875rem; /* Sets a slightly smaller but still readable text size for status messages */
+} 
+
+.trade-message.info { /* Styles messages marked as informational */
+    background: #eef4ff; /* Gives info messages a pale blue background */
+    color: #1a2b4c; /* Uses navy text for info messages */
+    border: 0.0625rem solid #c8d8f0; /* Adds a matching soft blue border */
+} 
+
+.trade-message.success { /* Styles messages marked as success */
+    background: #eaf7ee; /* Gives success messages a pale green background */
+    color: #1f5b36; /* Uses dark green text for positive confirmation */
+    border: 0.0625rem solid #b9dec4; /* Adds a matching green border */
+} 
+
+.trade-message.error { /* Styles messages marked as error */
+    background: #fdecec; /* Gives error messages a pale red background */
+    color: #8b1e2d; /* Uses dark red text for warning or error emphasis */
+    border: 0.0625rem solid #f3b8bf; /* Adds a soft red border matching the error theme */
+} 
+
+/* ========================================================== */ 
+   /* 6. CARDS */ /* Section heading for reusable card styling used across multiple pages */
+   /* ========================================================== */
+
+.card { /* Targets the reusable card container class */
+    background: white; /* Gives cards a white background so they stand out against the page background */
+    padding: 1.25rem; /* Adds inner space around card content */
+    border-radius: 0.5rem; /* Rounds the corners to create a soft modern card look */
+    border: 0.0625rem solid #d8dee8; /* Adds a subtle border around each card */
+    margin-bottom: 1.25rem; /* Adds space between cards stacked vertically */
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a soft drop shadow for depth */
+} 
+
+.card h3 { /* Targets h3 headings only when they are inside cards */
+    margin-top: 0; /* Removes default top spacing so card headings align neatly at the top of the card */
+    margin-bottom: 0.75rem; /* Adds space below card subheadings before the next content begins */
+} 
+
+/* ========================================================== */ 
+   /* 7. TABLES */ /* Section heading for all rules related to data tables */
+   /* ========================================================== */
+
+.table { /* Targets tables that use the class "table" */
+    width: 100%; /* Makes the table span the full width of its container */
+    border-collapse: collapse; /* Merges neighbouring cell borders into single lines for a cleaner table appearance */
+    margin-top: 0.9375rem; /* Adds spacing above the table */
+    background: white; /* Uses white background inside the table area */
+    font-size: 0.875rem; /* Sets readable text size for table data */
+} 
+
+.table th, /* Targets header cells */
+.table td { /* Targets data cells so both share consistent spacing and borders */
+    padding: 0.75rem; /* Adds space inside each table cell so the content is not cramped */
+    border-bottom: 0.0625rem solid #ddd; /* Adds a subtle horizontal divider between rows */
+    text-align: left; /* Left-aligns text for easier reading of financial data */
+    vertical-align: top; /* Aligns cell content to the top, which helps when text wraps onto multiple lines */
+} 
+
+.table th { /* Targets only table header cells */
+    background: #1a2b4c; /* Gives the header row a dark navy background for strong contrast */
+    color: white; /* Makes header text white so it is readable on the dark background */
+    position: sticky; /* Makes the header stay visible when scrolling inside a long table area */
+    top: 0; /* Defines the sticky position so the header sticks to the top edge */
+} 
+
+.table tr:hover { /* Styles table rows when hovered over */
+    background: #f1f5fa; /* Highlights the full row with a soft background colour to help the user follow across columns */
+} 
+
+.table th[data-sort] { /* Targets only header cells that include a data-sort attribute */
+    cursor: pointer; /* Changes cursor to pointer to signal that the header can be clicked for sorting */
+} 
+
+/* ========================================================== */
+   /* 8. SCORE HEATMAP / TAGS */ /* Section heading for colour-coded score rows and tags */
+   /* ========================================================== */ 
+
+.score-high { /* Targets rows or elements marked as high scoring */
+    background-color: #e7f7ed; /* Uses pale green to suggest strong or positive scoring */
+} 
+
+.score-medium { /* Targets medium-scoring rows or elements */
+    background-color: #fff8e1; /* Uses pale yellow to suggest moderate or cautionary scoring */
+} 
+
+.score-low { /* Targets lower-scoring rows or elements */
+    background-color: #fdecec; /* Uses pale red to suggest weaker or more cautious scoring */
+}
+
+.tag { /* Styles the small badge-like label used for decision tags */
+    display: inline-block; /* Allows padding and rounded shape while still sitting inline with text flow */
+    padding: 0.25rem 0.5rem; /* Adds internal spacing so the tag looks like a pill badge rather than plain text */
+    border-radius: 62.4375rem; /* Makes the corners fully rounded, creating a pill-shaped badge */
+    background: #dbe7ff; /* Gives the badge a soft blue background */
+    color: #1a2b4c; /* Uses navy text inside the badge */
+    font-size: 0.75rem; /* Makes badge text compact */
+    font-weight: bold; /* Makes the tag label stand out clearly */
+    white-space: nowrap; /* Prevents the tag text from breaking onto two lines, which would ruin the pill shape */
+} 
+
+/* ========================================================== */ 
+   /* 9. PAGE HELPERS */ /* Section heading for small reusable utility classes */
+   /* ========================================================== */
+
+.section { /* Utility class for adding spacing between major content sections */
+    margin-bottom: 1.875rem; /* Adds vertical space below any element using this helper class */
+} 
+
+.highlight { /* Utility class for emphasised text */
+    color: #1a2b4c; /* Gives highlighted text the main navy theme colour */
+    font-weight: bold; /* Makes highlighted text bold for emphasis */
+} 
+
+.muted { /* Utility class for less prominent text such as summaries or helper notes */
+    color: #5b6472; /* Uses a muted grey-blue text colour so the content appears less visually dominant */
+} 
+
+.portfolio-summary { /* Targets the summary box that displays portfolio metrics like positions, allocation, and cash */
+    display: grid; /* Uses CSS Grid so summary items can line up in a responsive structured layout */
+    grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr)); /* Creates as many columns as fit, each at least 180px wide, and expands them evenly; this is one of the harder lines because it makes the layout responsive automatically without fixed breakpoints */
+    gap: 0.625rem; /* Adds equal spacing between the grid items */
+    margin-bottom: 0.875rem; /* Adds spacing below the summary box */
+    padding: 0.75rem; /* Adds internal space around the box contents */
+    background: #f7f9fc; /* Uses a very light background to visually separate the summary area from surrounding content */
+    border: 0.0625rem solid #dde3eb; /* Adds a subtle border around the summary box */
+    border-radius: 0.375rem; /* Slightly rounds the corners */
+} 
+
+.portfolio-summary p { /* Targets paragraphs only inside the portfolio summary box */
+    margin: 0; /* Removes paragraph margins so the grid items stay neatly aligned and evenly spaced */
+} 
+
+.accordion {
+    width: 100%;
+    background-color: #eef2f7;
+    color: #1f2f56;
+    cursor: pointer;
+    padding: 0.625rem 0.875rem;
+    margin: 0.5rem 0 0 0;
+    border: 0.0625rem solid #d7deea;
+    border-radius: 0.375rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.accordion:hover {
+    background-color: #e2e9f3;
+}
+
+.accordion.active {
+    background-color: #d9e4f2;
+}
+
+.panel {
+    display: none;
+    padding: 0.75rem 0.875rem;
+    border: 0.0625rem solid #d7deea;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    background-color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.panel ul,
+.panel p {
+    margin-top: 0;
+    margin-bottom: 0.625rem;
+}
+
+/* ========================================================== */ 
+   /* 10. RESPONSIVE */ /* Section heading for styles that apply only on smaller screens */
+   /* ========================================================== */ 
+
+@media (max-width: 48rem) { /* Starts a media query that only applies the enclosed rules when the screen width is 768px or smaller, which is common for tablets and phones */
+    .container { /* Targets the main container on smaller screens */
+        padding: 1rem; /* Reduces page padding so content has more usable space on narrow devices */
+    } 
+
+    .navbar { /* Targets the navbar on smaller screens */
+        padding: 0.75rem 1rem; /* Reduces navbar padding so it fits better on smaller devices */
+        gap: 1rem; /* Reduces spacing between links so the navigation is more compact */
+    } 
+
+    input[type="text"], /* Targets text inputs on small screens */
+    input[type="number"], /* Targets number inputs on small screens */
+    select { /* Targets selects on small screens */
+        max-width: 100%; /* Removes the desktop width cap so controls can fully use the narrower mobile width */
+    } 
+
+    button { /* Targets buttons on smaller screens */
+        width: 100%; /* Makes buttons full width so they are easier to tap on touch devices and stack nicely */
+    } 
+
+    .table { /* Targets tables on smaller screens */
+        font-size: 0.75rem; /* Reduces table text size so more columns can fit within the narrow layout */
+    } 
+
+    .table th, /* Targets header cells on smaller screens */
+    .table td { /* Targets data cells on smaller screens */
+        padding: 0.5rem; /* Reduces cell padding to save horizontal space on smaller devices */
+    } 
+
+    .portfolio-summary { /* Targets the portfolio summary grid on smaller screens */
+        grid-template-columns: 1fr; /* Changes the grid to a single column so each summary item stacks vertically, making it easier to read on mobile */
+    } /* Ends responsive portfolio summary rule */
+
+    .results-grid {
+    grid-template-columns: 1fr;
+}
+}
