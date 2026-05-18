@@ -1,131 +1,184 @@
 {% extends "base.html" %}
-{% block title %}Market_Dashboard | PostgreSQL Portfolio App{% endblock %}
+{% block title %}Market Dashboard | PostgreSQL Portfolio App{% endblock %}
+
 {% block content %}
 
-    <h1>Market Dashboard</h1> 
+<h1>Market Dashboard</h1>
 
-    <!-- ========================================================= -->
-    <!-- DASHBOARD INTRO / EXPLANATION -->
-    <!-- ========================================================= -->
-    <div class="card"> <!-- card box for the intro text -->
-        <h2>What this dashboard does</h2> 
-        <p>
-            This page helps a portfolio manager screen securities before moving to detailed analysis.
-            It is designed to reduce the list quickly by applying return, volatility, ranking, and conviction filters.
-        </p>
+<div class="card">
+    <h2>Assign a Stock to a Portfolio Profile</h2>
 
-        <h3>What each smart preset means</h3> <!-- small heading for the preset explanations -->
+    <p>
+        This page connects the <strong>Portfolio Profiles</strong> page to the
+        <strong>Portfolio Performance</strong> page.
+    </p>
 
-        <p><strong>Low Risk:</strong> highlights more stable securities with lower market sensitivity. Typically includes assets with beta at or below 1 and moderate volatility. These are commonly used for capital preservation, income generation, or defensive positioning within a portfolio.</p> <!-- explains what the low risk button is trying to show -->
+    <p>
+        First select a saved portfolio profile, then select a stock or ETF.
+        When you click <strong>Analyse and Save Holding</strong>, the app sends the
+        selected portfolio and ticker to the Flask <strong>/add-to-portfolio</strong>
+        API route. The holding is saved in the database and then appears on the
+        Portfolio Performance page.
+    </p>
+</div>
 
-        <p><strong>High Conviction (6% position):</strong> identifies the strongest investment ideas based on expected return, volatility, and risk-adjusted performance. These are high-confidence opportunities where the manager allocates more capital.</p> <!-- explains the strongest ideas category -->
+<div class="card">
+    <h2>Add Stock to Selected Portfolio</h2>
 
-        <p><strong>Core Holdings (3.5% position):</strong> represents stable, well-balanced investments that form the foundation of the portfolio.</p> <!-- explains the core holding category -->
+    <form id="quick-add-form">
 
-        <p><strong>Satellite / Diversifiers (3% position):</strong> includes supporting positions used to enhance diversification or gain exposure to specific sectors.</p> <!-- explains the smaller supporting positions -->
+        <div class="form-grid">
 
-        <p><strong>Exploratory / High Risk (1–2% position):</strong> captures higher-risk opportunities with smaller allocations to control downside risk.</p> <!-- explains the more speculative ideas -->
+            <div>
+                <label for="quick_portfolio_key">Select Portfolio Profile</label>
 
-        <p><strong>Income / Defensive:</strong> focuses on securities providing stability or income such as bonds and defensive sectors.</p> <!-- explains the income / defensive screen -->
+                <select id="quick_portfolio_key" name="portfolio_key" required>
+                    <option value="">-- Choose a portfolio profile --</option>
 
-        <p><strong>Best Ranked:</strong> highlights securities with strong scores and acceptable risk-adjusted returns.</p> <!-- explains the best ranked preset -->
-
-        <p><strong>Cash (5% allocation):</strong> represents holding cash when no suitable investments are found or to manage risk.</p> <!-- explains the cash decision idea -->
-    </div> 
-    <!-- ========================================================= -->
-    <!-- FILTERS / SCREENING TOOLS -->
-    <!-- ========================================================= -->
-    <div class="card"> <!-- card for all dashboard filters -->
-    <h2>Smart Filters</h2> <!-- heading for filter area -->
-
-        <div class="filters-grid"> <!-- grid layout so filters line up nicely -->
-
-            <div> <!-- ticker dropdown -->
-                <label for="ticker-filter">Ticker</label> <!-- label connected to ticker select -->
-                <select id="ticker-filter"> <!-- dropdown to filter by ticker -->
-                    <option value="">All tickers</option> <!-- default option shows everything -->
-                    {% for ticker in rows | map(attribute='ticker') | list | sort %}
-                    <option value="{{ ticker }}">{{ ticker }}</option> <!-- fills ticker options from backend data -->
+                    {% for portfolio in portfolio_choices %}
+                        <option value="{{ portfolio.key }}">
+                            {{ portfolio.name }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
 
-            <div> <!-- decision dropdown -->
-                <label for="decision-filter">Decision</label> <!-- label for decision filter -->
-                <select id="decision-filter"> <!-- dropdown to filter by decision type -->
-                    <option value="">All decisions</option> <!-- default option -->
-                    <option value="YES — high conviction">YES — high conviction</option>
-                    <option value="YES — core holding">YES — core holding</option>
-                    <option value="YES — satellite">YES — satellite</option>
-                    <option value="LIMITED — high risk / exploratory">LIMITED — high risk / exploratory</option>
-                    <option value="NO — hold as cash instead">NO — hold as cash instead</option>
+            <div>
+                <label for="quick_ticker">Select Stock / ETF</label>
+
+                <select id="quick_ticker" name="ticker" required>
+                    <option value="">-- Choose a stock or ETF --</option>
+
+                    {% for row in rows %}
+                        <option value="{{ row.ticker }}">
+                            {{ row.ticker }} — {{ row.tag }} — {{ row.suggested_weight }}
+                        </option>
+                    {% endfor %}
                 </select>
-            </div>
-
-            <div> <!-- minimum score dropdown -->
-                <label for="score-filter">Minimum Score</label> <!-- label for score filter -->
-                <select id="score-filter"> <!-- dropdown for minimum score -->
-                    <option value="">Any</option> <!-- no score restriction -->
-                    <option value="3">3+</option>
-                    <option value="5">5+</option>
-                    <option value="7">7+</option>
-                </select>
-            </div>
-
-            <div> <!-- max volatility input -->
-                <label for="volatility-filter">Maximum Volatility %</label> <!-- label for volatility filter -->
-                <input type="number" id="volatility-filter" step="0.1" placeholder="e.g. 15"> <!-- user can type in a max volatility -->
-            </div>
-
-            <div> <!-- min sharpe input -->
-                <label for="sharpe-filter">Minimum Sharpe</label> <!-- label for Sharpe filter -->
-                <input type="number" id="sharpe-filter" step="0.1" placeholder="e.g. 0.5"> <!-- user can type minimum Sharpe score -->
             </div>
 
         </div>
 
-   <!-- ========================================================= -->
-   <!-- QUICK PRESET BUTTONS -->
-   <!-- ========================================================= -->
-        <div class="filter-actions"> <!-- button row for one-click presets -->
-            <button type="button" id="preset-low-risk">Low Risk</button> <!-- quick filter for low risk names -->
-            <button type="button" id="preset-high-conviction">High Conviction</button> <!-- quick filter for strongest ideas -->
-            <button type="button" id="preset-core">Core Holdings</button> <!-- quick filter for core positions -->
-            <button type="button" id="preset-satellite">Satellite / Diversifiers</button> <!-- quick filter for diversifier names -->
-            <button type="button" id="preset-exploratory">Exploratory / High Risk</button> <!-- quick filter for high risk / smaller positions -->
-            <button type="button" id="preset-income">Income / Defensive</button> <!-- quick filter for defensive / income names -->
-            <button type="button" id="preset-best-ranked">Best Ranked</button> <!-- quick filter for best ranked rows -->
-            <button type="button" id="preset-cash">Cash</button> <!-- quick filter for names that fall into cash decision -->
-            <button type="button" id="clear-filters">Clear Filters</button> <!-- resets everything back to default -->
+        <button type="submit">
+            Analyse and Save Holding
+        </button>
+
+    </form>
+
+    <div id="quick-add-message" class="trade-message"></div>
+</div>
+
+<div class="card">
+    <h2>What this dashboard does</h2>
+
+    <p>
+        This page helps a portfolio manager screen securities before assigning them
+        to a portfolio. The table below can be filtered by ticker, decision, score,
+        volatility, and Sharpe-like ratio.
+    </p>
+
+    <p>
+        The filtered table supports the investment workflow, while the form above
+        performs the database-backed stock-to-profile assignment.
+    </p>
+
+    <h3>What each smart preset means</h3>
+
+    <p><strong>Low Risk:</strong> highlights more stable securities with lower volatility.</p>
+    <p><strong>High Conviction:</strong> identifies the strongest investment ideas based on score and risk-adjusted performance.</p>
+    <p><strong>Core Holdings:</strong> represents stable, well-balanced investments suitable for foundation positions.</p>
+    <p><strong>Satellite / Diversifiers:</strong> includes supporting positions used to improve diversification.</p>
+    <p><strong>Exploratory / High Risk:</strong> captures higher-risk ideas that should normally receive smaller allocations.</p>
+    <p><strong>Income / Defensive:</strong> focuses on defensive or income-oriented securities.</p>
+    <p><strong>Best Ranked:</strong> highlights securities with stronger dashboard scores.</p>
+    <p><strong>Cash:</strong> represents cases where the security does not meet the investment criteria.</p>
+</div>
+
+<div class="card">
+    <h2>Smart Filters</h2>
+
+    <div class="filters-grid">
+
+        <div>
+            <label for="ticker-filter">Ticker</label>
+            <select id="ticker-filter">
+                <option value="">All tickers</option>
+                {% for ticker in rows | map(attribute='ticker') | list | sort %}
+                    <option value="{{ ticker }}">{{ ticker }}</option>
+                {% endfor %}
+            </select>
         </div>
 
-        <p id="dashboard-summary" class="muted">Showing all securities.</p> <!-- this text changes after filters are applied -->
+        <div>
+            <label for="decision-filter">Decision</label>
+            <select id="decision-filter">
+                <option value="">All decisions</option>
+                <option value="YES — high conviction">YES — high conviction</option>
+                <option value="YES — core holding">YES — core holding</option>
+                <option value="YES — satellite">YES — satellite</option>
+                <option value="LIMITED — high risk / exploratory">LIMITED — high risk / exploratory</option>
+                <option value="NO — hold as cash instead">NO — hold as cash instead</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="score-filter">Minimum Score</label>
+            <select id="score-filter">
+                <option value="">Any</option>
+                <option value="3">3+</option>
+                <option value="5">5+</option>
+                <option value="7">7+</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="volatility-filter">Maximum Volatility %</label>
+            <input type="number" id="volatility-filter" step="0.1" placeholder="e.g. 15">
+        </div>
+
+        <div>
+            <label for="sharpe-filter">Minimum Sharpe</label>
+            <input type="number" id="sharpe-filter" step="0.1" placeholder="e.g. 0.5">
+        </div>
+
     </div>
 
-    <!-- ========================================================= -->
-    <!-- DATA TABLE / DASHBOARD RESULTS -->
-    <!-- ========================================================= -->
-    <div class="card"> <!-- card that holds the market table -->
-        <h2>Yahoo Finance Market Table</h2> <!-- table heading -->
+    <div class="filter-actions">
+        <button type="button" id="preset-low-risk">Low Risk</button>
+        <button type="button" id="preset-high-conviction">High Conviction</button>
+        <button type="button" id="preset-core">Core Holdings</button>
+        <button type="button" id="preset-satellite">Satellite / Diversifiers</button>
+        <button type="button" id="preset-exploratory">Exploratory / High Risk</button>
+        <button type="button" id="preset-income">Income / Defensive</button>
+        <button type="button" id="preset-best-ranked">Best Ranked</button>
+        <button type="button" id="preset-cash">Cash</button>
+        <button type="button" id="clear-filters">Clear Filters</button>
+    </div>
 
-        <table class="table" id="market-table"> <!-- main table used by JavaScript filters and sorting -->
-            <thead>
-                <tr>
-                    <th data-sort="ticker">Ticker</th> <!-- sortable ticker column -->
-                    <th data-sort="latest_price">Latest Price</th> <!-- sortable latest price -->
-                    <th data-sort="expected_return_percent">Expected Return</th> <!-- sortable return column -->
-                    <th data-sort="score">Score</th> <!-- sortable score column -->
-                    <th data-sort="decision">Decision</th> <!-- sortable decision column -->
-                    <th data-sort="tag">Tag</th> <!-- sortable tag column -->
-                    <th data-sort="suggested_weight">Suggested Weight</th> <!-- sortable suggested weight -->
-                    <th data-sort="volatility">Volatility</th> <!-- sortable volatility -->
-                    <th data-sort="sharpe_like">Sharpe</th> <!-- sortable Sharpe-like value -->
-                    <th data-sort="ranking_score">Ranking Score</th> <!-- sortable ranking score -->
-                </tr>
-            </thead>
+    <p id="dashboard-summary" class="muted">Showing all securities.</p>
+</div>
 
-            <tbody>
-                {% for row in rows %}
+<div class="card">
+    <h2>Yahoo Finance Market Table</h2>
+
+    <table class="table" id="market-table">
+        <thead>
+            <tr>
+                <th data-sort="ticker">Ticker</th>
+                <th data-sort="latest_price">Latest Price</th>
+                <th data-sort="expected_return_percent">Expected Return</th>
+                <th data-sort="score">Score</th>
+                <th data-sort="decision">Decision</th>
+                <th data-sort="tag">Tag</th>
+                <th data-sort="suggested_weight">Suggested Weight</th>
+                <th data-sort="volatility">Volatility</th>
+                <th data-sort="sharpe_like">Sharpe</th>
+                <th data-sort="ranking_score">Ranking Score</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in rows %}
                 <tr
                     data-ticker="{{ row.ticker }}"
                     data-decision="{{ row.decision }}"
@@ -142,22 +195,21 @@
                     data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}"
                     data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}"
                     class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}"
-                > <!-- each row also stores hidden data attributes so JS can filter properly -->
-                    <td>{{ row.ticker }}</td> <!-- ticker symbol -->
-                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td> <!-- latest market price -->
-                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td> <!-- expected return shown as a percent -->
-                    <td>{{ row.score if row.score is not none else "N/A" }}</td> <!-- numeric score -->
-                    <td>{{ row.decision }}</td> <!-- model decision -->
-                    <td><span class="tag">{{ row.tag }}</span></td> <!-- short category tag -->
-                    <td>{{ row.suggested_weight }}</td> <!-- suggested portfolio weight -->
-                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> <!-- volatility shown as percent -->
-                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> <!-- Sharpe-like metric -->
-                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> <!-- final ranking score -->
+                >
+                    <td>{{ row.ticker }}</td>
+                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td>
+                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td>
+                    <td>{{ row.score if row.score is not none else "N/A" }}</td>
+                    <td>{{ row.decision }}</td>
+                    <td><span class="tag">{{ row.tag }}</span></td>
+                    <td>{{ row.suggested_weight }}</td>
+                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td>
+                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td>
+                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table> 
-    </div>
-
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

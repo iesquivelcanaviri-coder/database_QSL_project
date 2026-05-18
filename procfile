@@ -1,6 +1,1 @@
-# I use this line to tell the web server (like Render) how to launch my app.
-# 'web:' means this is a public-facing web process.
-# 'gunicorn' is the professional-grade server I use to run Flask in production.
-# 'app:app' tells gunicorn: "Look in the file called app.py for the variable named app."
-
 web: gunicorn app:app

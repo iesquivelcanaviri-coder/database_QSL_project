@@ -1,20 +1,6 @@
-# I use Flask as my main web framework to handle routes and pages.
 Flask
-
-# I use this to connect my Python code to my database using 'Models'.
 Flask-SQLAlchemy
-
-# I use this to read my .env file so I can keep my passwords and keys secret.
-python-dotenv
-
-# I need this driver so Python can actually talk to a PostgreSQL database.
-psycopg2-binary
-
-# This is my professional-grade web server that runs the app on Render.
 gunicorn
-
-# I use this to fetch real-time financial and stock market data.
 yfinance
-
-# I use this to handle all the heavy math and data calculations for my portfolios.
 numpy
+psycopg2-binary

@@ -348,6 +348,8 @@ The `.env` file should never be committed to GitHub.
 ## 4. Run the application
 
 ```bash
+pip install flask flask_sqlalchemy psycopg2-binary yfinance numpy
+
 python app.py
 ```
 

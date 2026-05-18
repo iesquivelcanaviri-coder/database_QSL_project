@@ -1,188 +1,36 @@
 {% extends "base.html" %}
 
-{# ========================================================= #}
-{# PAGE TITLE                                                #}
-{# This title appears in the browser tab                     #}
-{# ========================================================= #}
-
-{% block title %}
-Home | PostgreSQL Portfolio App
-{% endblock %}
-
-{# ========================================================= #}
-{# MAIN PAGE CONTENT                                         #}
-{# ========================================================= #}
+{% block title %}Home | PostgreSQL Portfolio App{% endblock %}
 
 {% block content %}
 
-<!-- ====================================================== -->
-<!-- HERO / INTRODUCTION CARD                               -->
-<!-- ====================================================== -->
-
 <div class="card">
-
-    <h1>
-        Portfolio Management Decision-Support Web Application
-        with PostgreSQL
-    </h1>
-
+    <h1>Portfolio Management Decision-Support Web Application with PostgreSQL</h1>
     <p>
-        This application upgrades the previous in-memory Flask
-        portfolio workflow into a fully database-backed system
-        using PostgreSQL and Flask-SQLAlchemy.
+        This Flask application demonstrates a database-backed portfolio management workflow
+        using PostgreSQL, Flask-SQLAlchemy, Jinja templates, CSS, and JavaScript.
     </p>
-
-    <p>
-        The project demonstrates database integration, CRUD operations,
-        Flask routing, SQLAlchemy ORM usage, HTML templating,
-        responsive frontend design, and deployment-ready architecture.
-    </p>
-
 </div>
 
-<!-- ====================================================== -->
-<!-- MAIN APPLICATION FEATURES                              -->
-<!-- ====================================================== -->
-
 <div class="card">
-
-    <h2>Database-Backed Features</h2>
-
-    <p class="muted">
-        The application stores and retrieves data dynamically from
-        a PostgreSQL relational database.
-    </p>
-
-    <ul>
-
-        <li>
-            Portfolio mandates are stored as database records using
-            the <strong>Portfolio</strong> model.
-        </li>
-
-        <li>
-            Ticker analysis results are stored as
-            <strong>AnalysisRecord</strong> database entries.
-        </li>
-
-        <li>
-            Portfolio holdings support complete
-            <strong>Create, Read, Update, and Delete (CRUD)</strong>
-            functionality.
-        </li>
-
-        <li>
-            Contact form submissions are stored using the
-            <strong>ContactMessage</strong> model.
-        </li>
-
-        <li>
-            Portfolio relationships are managed using
-            SQLAlchemy foreign keys and ORM relationships.
-        </li>
-
-    </ul>
-
-</div>
-
-<!-- ====================================================== -->
-<!-- HOW TO USE THE APPLICATION                             -->
-<!-- ====================================================== -->
-
-<div class="card">
-
-    <h2>How to Use the Application</h2>
-
+    <h2>Main Workflow</h2>
     <ol>
-
-        <li>
-            Review portfolio mandates and investor profiles
-            on the <strong>Portfolio Profiles</strong> page.
-        </li>
-
-        <li>
-            Screen and filter securities inside the
-            <strong>Market Dashboard</strong>.
-        </li>
-
-        <li>
-            Analyse a ticker using the
-            <strong>Criteria</strong> page.
-        </li>
-
-        <li>
-            Add holdings to a portfolio and verify that
-            the data persists inside the PostgreSQL database.
-        </li>
-
-        <li>
-            Update and delete holdings to demonstrate
-            CRUD database functionality.
-        </li>
-
-        <li>
-            Submit a contact message and verify that
-            it appears dynamically on the Contact page.
-        </li>
-
+        <li>Create client portfolio profiles on the <strong>Portfolio Profiles</strong> page.</li>
+        <li>Select a portfolio and stock on the <strong>Market Dashboard</strong> page.</li>
+        <li>Save analysed stocks into the selected portfolio using database-backed CRUD logic.</li>
+        <li>Review how each portfolio is doing on the <strong>Portfolio Performance</strong> page.</li>
     </ol>
-
 </div>
-
-<!-- ====================================================== -->
-<!-- TECHNOLOGY STACK                                       -->
-<!-- ====================================================== -->
 
 <div class="card">
-
-    <h2>Main Technologies Used</h2>
-
-    <div class="portfolio-summary">
-
-        <div>
-            <p><strong>Backend</strong></p>
-            <p>Python, Flask, SQLAlchemy</p>
-        </div>
-
-        <div>
-            <p><strong>Database</strong></p>
-            <p>PostgreSQL</p>
-        </div>
-
-        <div>
-            <p><strong>Frontend</strong></p>
-            <p>HTML5, CSS3, JavaScript</p>
-        </div>
-
-        <div>
-            <p><strong>Deployment</strong></p>
-            <p>Render + Gunicorn</p>
-        </div>
-
-    </div>
-
+    <h2>Database Features Demonstrated</h2>
+    <ul>
+        <li><strong>Create:</strong> save new portfolio profiles and holdings.</li>
+        <li><strong>Read:</strong> display profiles, dashboard data, holdings, and contact messages.</li>
+        <li><strong>Update:</strong> update an existing holding when the same ticker is saved again.</li>
+        <li><strong>Delete:</strong> remove saved holdings from a portfolio.</li>
+    </ul>
 </div>
 
-<!-- ====================================================== -->
-<!-- EDUCATIONAL PURPOSE NOTICE                             -->
-<!-- ====================================================== -->
-
-<div class="card">
-
-    <h2>Educational Purpose</h2>
-
-    <p>
-        This project was developed as part of a database and web
-        development assignment focused on integrating Flask,
-        PostgreSQL, SQLAlchemy ORM, and responsive frontend design.
-    </p>
-
-    <p class="muted">
-        The portfolio analytics and investment outputs shown
-        in this application are simplified educational calculations
-        and are not financial advice.
-    </p>
-
-</div>
 
 {% endblock %}

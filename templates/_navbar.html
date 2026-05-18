@@ -1,23 +1,7 @@
 <div class="navbar">
-
-    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">
-        Home
-    </a>
-
-    <a href="{{ url_for('portfolio_profiles') }}" class="{% if active_page == 'portfolio_profiles' %}active{% endif %}">
-        Portfolio Profiles
-    </a>
-
-    <a href="{{ url_for('market_dashboard') }}" class="{% if active_page == 'market_dashboard' %}active{% endif %}">
-        Market Dashboard
-    </a>
-
-    <a href="{{ url_for('criteria') }}" class="{% if active_page == 'criteria' %}active{% endif %}">
-        Criteria
-    </a>
-
-    <a href="{{ url_for('contact') }}" class="{% if active_page == 'contact' %}active{% endif %}">
-        Contact
-    </a>
-
+    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+    <a href="{{ url_for('portfolio_profiles') }}" class="{% if active_page == 'portfolio_profiles' %}active{% endif %}">Portfolio Profiles</a>
+    <a href="{{ url_for('market_dashboard') }}" class="{% if active_page == 'market_dashboard' %}active{% endif %}">Market Dashboard</a>
+    <a href="{{ url_for('portfolio_performance') }}" class="{% if active_page == 'portfolio_performance' %}active{% endif %}">Portfolio Performance</a>
+    <a href="{{ url_for('contact') }}" class="{% if active_page == 'contact' %}active{% endif %}">Contact</a>
 </div>

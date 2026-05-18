@@ -1,198 +1,63 @@
 {% extends "base.html" %}
 
-{# ========================================================= #}
-{# PAGE TITLE                                                #}
-{# This title appears in the browser tab                     #}
-{# ========================================================= #}
-
-{% block title %}
-Contact | PostgreSQL Portfolio App
-{% endblock %}
-
-{# ========================================================= #}
-{# MAIN PAGE CONTENT                                         #}
-{# ========================================================= #}
+{% block title %}Contact | PostgreSQL Portfolio App{% endblock %}
 
 {% block content %}
 
-<!-- ====================================================== -->
-<!-- PAGE INTRODUCTION                                      -->
-<!-- ====================================================== -->
-
 <div class="card">
-
-    <h1>Contact</h1>
-
+    <h1>Contact Message Storage</h1>
     <p>
-        This page demonstrates database-backed contact form storage
-        using the Flask-SQLAlchemy <strong>ContactMessage</strong> model.
+        This page demonstrates database-backed contact form storage using the
+        <strong>ContactMessage</strong> SQLAlchemy model.
     </p>
-
-    <p>
-        Submitted contact records are stored inside the PostgreSQL database
-        and retrieved dynamically using SQLAlchemy queries.
-    </p>
-
 </div>
 
-<!-- ====================================================== -->
-<!-- CONTACT FORM CARD                                      -->
-<!-- ====================================================== -->
-
 <div class="card">
-
     <h2>Save a Contact Message</h2>
 
-    <!-- ================================================== -->
-    <!-- CONTACT FORM                                       -->
-    <!-- Sends a POST request to the Flask contact route    -->
-    <!-- ================================================== -->
-
     <form method="post" action="{{ url_for('contact') }}">
-
-        <!-- ============================================== -->
-        <!-- NAME INPUT                                     -->
-        <!-- ============================================== -->
-
         <label for="name">Name</label>
-
-        <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Enter your name"
-            required
-        >
-
-        <!-- ============================================== -->
-        <!-- EMAIL INPUT                                    -->
-        <!-- ============================================== -->
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
 
         <label for="email">Email</label>
-
-        <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email address"
-            required
-        >
-
-        <!-- ============================================== -->
-        <!-- MESSAGE TEXTAREA                               -->
-        <!-- ============================================== -->
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
         <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" placeholder="Write your message" required></textarea>
 
-        <textarea
-            id="message"
-            name="message"
-            rows="5"
-            placeholder="Write your message here..."
-            required
-        ></textarea>
-
-        <!-- ============================================== -->
-        <!-- SUBMIT BUTTON                                  -->
-        <!-- ============================================== -->
-
-        <button type="submit">
-            Save Message
-        </button>
-
+        <button type="submit">Save Message</button>
     </form>
-
 </div>
 
-<!-- ====================================================== -->
-<!-- RECENT DATABASE MESSAGES                               -->
-<!-- ====================================================== -->
-
 <div class="card">
-
     <h2>Recent Contact Messages</h2>
 
-    <p class="muted">
-        The table below displays contact messages retrieved from the
-        PostgreSQL database using SQLAlchemy ORM queries.
-    </p>
-
-    <!-- ================================================== -->
-    <!-- CONDITIONAL DATABASE DISPLAY                       -->
-    <!-- Only show table if messages exist                  -->
-    <!-- ================================================== -->
-
     {% if messages %}
-
-        <!-- ============================================== -->
-        <!-- CONTACT MESSAGE TABLE                          -->
-        <!-- ============================================== -->
-
         <table class="table">
-
             <thead>
-
                 <tr>
-
+                    <th>Database ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Message</th>
                     <th>Created At</th>
-
                 </tr>
-
             </thead>
-
             <tbody>
-
-                <!-- ====================================== -->
-                <!-- LOOP THROUGH DATABASE RECORDS          -->
-                <!-- ====================================== -->
-
                 {% for item in messages %}
-
                     <tr>
-
-                        <!-- NAME -->
-                        <td>
-                            {{ item.name }}
-                        </td>
-
-                        <!-- EMAIL -->
-                        <td>
-                            {{ item.email }}
-                        </td>
-
-                        <!-- MESSAGE -->
-                        <td>
-                            {{ item.message }}
-                        </td>
-
-                        <!-- TIMESTAMP -->
-                        <td>
-                            {{ item.created_at.strftime('%Y-%m-%d %H:%M') }}
-                        </td>
-
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.email }}</td>
+                        <td>{{ item.message }}</td>
+                        <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>
-
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     {% else %}
-
-        <!-- ============================================== -->
-        <!-- EMPTY DATABASE STATE                           -->
-        <!-- ============================================== -->
-
-        <p class="muted">
-            No contact messages have been saved yet.
-        </p>
-
+        <p class="muted">No contact messages have been saved yet.</p>
     {% endif %}
-
 </div>
 
 {% endblock %}

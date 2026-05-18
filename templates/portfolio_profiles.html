@@ -1,244 +1,627 @@
 {% extends "base.html" %}
 
-{# ========================================================= #}
-{# PAGE TITLE                                                #}
-{# This title appears in the browser tab                     #}
-{# ========================================================= #}
-
 {% block title %}
 Portfolio Profiles | PostgreSQL Portfolio App
 {% endblock %}
 
-{# ========================================================= #}
-{# MAIN PAGE CONTENT                                         #}
-{# Everything inside this block is inserted into base.html   #}
-{# ========================================================= #}
-
 {% block content %}
 
 <!-- ====================================================== -->
-<!-- PAGE INTRODUCTION CARD                                 -->
+<!-- PAGE INTRODUCTION                                      -->
 <!-- ====================================================== -->
 
 <div class="card">
-
-    <h1>Portfolio Profiles and Database-Backed Mandates</h1>
+    <h1>Portfolio Profiles and Client Mandate Records</h1>
 
     <p>
-        This page displays portfolio mandates stored inside the PostgreSQL database
-        using the Flask-SQLAlchemy Portfolio model.
+        This page demonstrates the <strong>Create</strong> and <strong>Read</strong>
+        parts of CRUD for the <strong>Portfolio</strong> database model.
     </p>
 
     <p>
-        Each portfolio includes mandate information, compliance data,
-        investment objectives, constraints, and saved portfolio holdings.
+        Use the form below to create a new client portfolio profile. The information
+        is saved into PostgreSQL through Flask-SQLAlchemy using the
+        <strong>profile_data</strong> JSON field.
     </p>
-
 </div>
 
 <!-- ====================================================== -->
-<!-- LOOP THROUGH ALL PORTFOLIOS                            -->
-<!-- Each portfolio returned from Flask is rendered below   -->
+<!-- CREATE NEW PORTFOLIO PROFILE FORM                      -->
+<!-- The field names match build_profile_data_from_form()    -->
+<!-- in app.py                                               -->
 <!-- ====================================================== -->
+
+<div class="card">
+    <h2>Create a New Portfolio Profile</h2>
+
+    <form method="post" action="{{ url_for('portfolio_profiles') }}">
+
+        <h3>1. Portfolio Record</h3>
+
+        <label for="key">Portfolio Key</label>
+        <input
+            type="text"
+            id="key"
+            name="key"
+            placeholder="example: james_oconnor_growth"
+            required
+        >
+
+        <label for="client_id">Client ID</label>
+        <input
+            type="text"
+            id="client_id"
+            name="client_id"
+            placeholder="example: client_006_james_oconnor"
+            required
+        >
+
+        <label for="display_name">Display Name</label>
+        <input
+            type="text"
+            id="display_name"
+            name="display_name"
+            placeholder="example: James O'Connor"
+            required
+        >
+
+        <label for="benchmark_ticker">Benchmark / Reference Ticker</label>
+        <select id="benchmark_ticker" name="benchmark_ticker" required>
+            <option value="">-- Select benchmark --</option>
+            <option value="ACWI">ACWI — Global Equity</option>
+            <option value="SPY">SPY — S&amp;P 500</option>
+            <option value="QQQ">QQQ — Nasdaq 100</option>
+            <option value="IEF">IEF — US 7-10 Year Treasury</option>
+            <option value="SHY">SHY — Short-Term Treasury</option>
+            <option value="AGG">AGG — Aggregate Bond</option>
+            <option value="AOR">AOR — Balanced Allocation ETF</option>
+        </select>
+
+        <label for="portfolio_value">Portfolio Value</label>
+        <input
+            type="number"
+            id="portfolio_value"
+            name="portfolio_value"
+            min="0"
+            step="1000"
+            placeholder="example: 600000"
+            required
+        >
+
+        <label for="max_weight">Maximum Position Weight (%)</label>
+        <select id="max_weight" name="max_weight" required>
+            <option value="">-- Select maximum weight --</option>
+            <option value="5">5%</option>
+            <option value="10">10%</option>
+            <option value="15">15%</option>
+            <option value="20">20%</option>
+        </select>
+
+        <h3>2. Identity and Account Control</h3>
+
+        <label for="client_type">Client Type</label>
+        <select id="client_type" name="client_type" required>
+            <option value="">-- Select client type --</option>
+            <option value="Individual">Individual</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Family Office">Family Office</option>
+            <option value="Trust">Trust</option>
+        </select>
+
+        <label for="client_name">Client / Entity Name</label>
+        <input
+            type="text"
+            id="client_name"
+            name="client_name"
+            placeholder="example: James O'Connor"
+            required
+        >
+
+        <label for="date_of_birth">Date of Birth / Incorporation Year</label>
+        <input
+            type="text"
+            id="date_of_birth"
+            name="date_of_birth"
+            placeholder="example: 1981-07-04 or 2012"
+        >
+
+        <label for="nationality">Nationality / Residency</label>
+        <input
+            type="text"
+            id="nationality"
+            name="nationality"
+            placeholder="example: Irish"
+        >
+
+        <label for="tax_residency">Tax Residency</label>
+        <input
+            type="text"
+            id="tax_residency"
+            name="tax_residency"
+            placeholder="example: Ireland"
+        >
+
+        <label for="address">Address / Location</label>
+        <input
+            type="text"
+            id="address"
+            name="address"
+            placeholder="example: Dublin, Ireland"
+        >
+
+        <label for="identification">Identification</label>
+        <select id="identification" name="identification">
+            <option value="">-- Select identification type --</option>
+            <option value="Passport">Passport</option>
+            <option value="National ID">National ID</option>
+            <option value="Company Registration">Company Registration</option>
+            <option value="Trust Deed">Trust Deed</option>
+        </select>
+
+        <h3>3. Compliance Review</h3>
+
+        <label for="kyc">KYC Status</label>
+        <select id="kyc" name="kyc" required>
+            <option value="">-- Select KYC status --</option>
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+            <option value="Requires Review">Requires Review</option>
+        </select>
+
+        <label for="aml">AML Status</label>
+        <select id="aml" name="aml" required>
+            <option value="">-- Select AML status --</option>
+            <option value="No issues">No issues</option>
+            <option value="Clean">Clean</option>
+            <option value="Requires Enhanced Due Diligence">Requires Enhanced Due Diligence</option>
+        </select>
+
+        <label for="source_of_wealth">Source of Wealth</label>
+        <select id="source_of_wealth" name="source_of_wealth">
+            <option value="">-- Select source of wealth --</option>
+            <option value="Salary and bonuses">Salary and bonuses</option>
+            <option value="Pension and inheritance">Pension and inheritance</option>
+            <option value="Business sale">Business sale</option>
+            <option value="Operating profits">Operating profits</option>
+            <option value="Real estate and private equity">Real estate and private equity</option>
+        </select>
+
+        <label for="source_of_funds">Source of Funds</label>
+        <select id="source_of_funds" name="source_of_funds">
+            <option value="">-- Select source of funds --</option>
+            <option value="Corporate employment">Corporate employment</option>
+            <option value="Retirement savings">Retirement savings</option>
+            <option value="Business sale and dividends">Business sale and dividends</option>
+            <option value="Corporate cash reserves">Corporate cash reserves</option>
+            <option value="Family assets">Family assets</option>
+        </select>
+
+        <label for="fatca_crs">FATCA / CRS</label>
+        <select id="fatca_crs" name="fatca_crs">
+            <option value="">-- Select FATCA / CRS classification --</option>
+            <option value="CRS only">CRS only</option>
+            <option value="Corporate CRS">Corporate CRS</option>
+            <option value="FATCA reportable">FATCA reportable</option>
+            <option value="Not reportable">Not reportable</option>
+        </select>
+
+        <label for="pep">PEP Status</label>
+        <select id="pep" name="pep">
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+            <option value="Low-risk PEP">Low-risk PEP</option>
+        </select>
+
+        <h3>4. Investment Objectives</h3>
+
+        <label for="goals">Investment Goal</label>
+        <select id="goals" name="goals" required>
+            <option value="">-- Select investment goal --</option>
+            <option value="Capital preservation and stable income">Capital preservation and stable income</option>
+            <option value="Long-term growth">Long-term growth</option>
+            <option value="Preserve capital and earn yield">Preserve capital and earn yield</option>
+            <option value="Growth and diversification">Growth and diversification</option>
+            <option value="Preserve wealth and achieve moderate growth">Preserve wealth and achieve moderate growth</option>
+        </select>
+
+        <label for="time_horizon_years">Time Horizon</label>
+        <select id="time_horizon_years" name="time_horizon_years" required>
+            <option value="">-- Select time horizon --</option>
+            <option value="1-3">1-3 years</option>
+            <option value="5-7">5-7 years</option>
+            <option value="10+">10+ years</option>
+            <option value="15+">15+ years</option>
+            <option value="30+">30+ years</option>
+        </select>
+
+        <label for="expected_return_percent">Expected Return (%)</label>
+        <select id="expected_return_percent" name="expected_return_percent" required>
+            <option value="">-- Select expected return --</option>
+            <option value="1-2">1-2%</option>
+            <option value="2-3">2-3%</option>
+            <option value="5-7">5-7%</option>
+            <option value="6-8">6-8%</option>
+            <option value="8-12">8-12%</option>
+        </select>
+
+        <label for="benchmark">Benchmark Description</label>
+        <select id="benchmark" name="benchmark" required>
+            <option value="">-- Select benchmark description --</option>
+            <option value="Eurozone government bond index">Eurozone government bond index</option>
+            <option value="MSCI World">MSCI World</option>
+            <option value="CHF money-market index">CHF money-market index</option>
+            <option value="MSCI ACWI">MSCI ACWI</option>
+            <option value="40/60 global portfolio">40/60 global portfolio</option>
+        </select>
+
+        <h3>5. Risk Profile</h3>
+
+        <label for="risk_tolerance">Risk Tolerance</label>
+        <select id="risk_tolerance" name="risk_tolerance" required>
+            <option value="">-- Select risk tolerance --</option>
+            <option value="Very low">Very low</option>
+            <option value="Conservative">Conservative</option>
+            <option value="Balanced">Balanced</option>
+            <option value="Growth">Growth</option>
+            <option value="Aggressive">Aggressive</option>
+        </select>
+
+        <label for="risk_capacity">Risk Capacity</label>
+        <select id="risk_capacity" name="risk_capacity" required>
+            <option value="">-- Select risk capacity --</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Very high">Very high</option>
+        </select>
+
+        <label for="max_drawdown_percent">Maximum Drawdown (%)</label>
+        <select id="max_drawdown_percent" name="max_drawdown_percent" required>
+            <option value="">-- Select max drawdown --</option>
+            <option value="-3">-3%</option>
+            <option value="-8">-8%</option>
+            <option value="-15">-15%</option>
+            <option value="-20">-20%</option>
+            <option value="-30">-30%</option>
+        </select>
+
+        <h3>6. Financial Position and Liquidity</h3>
+
+        <label for="net_worth">Net Worth</label>
+        <input type="number" id="net_worth" name="net_worth" min="0" step="1000">
+
+        <label for="investments">Investments</label>
+        <input type="number" id="investments" name="investments" min="0" step="1000">
+
+        <label for="real_estate">Real Estate</label>
+        <select id="real_estate" name="real_estate">
+            <option value="">-- Select real estate position --</option>
+            <option value="None">None</option>
+            <option value="Primary residence">Primary residence</option>
+            <option value="Home and rental property">Home and rental property</option>
+            <option value="Three properties">Three properties</option>
+            <option value="Large real estate exposure">Large real estate exposure</option>
+        </select>
+
+        <label for="liabilities">Liabilities</label>
+        <input type="number" id="liabilities" name="liabilities" min="0" step="1000">
+
+        <label for="income">Income</label>
+        <input type="text" id="income" name="income" placeholder="example: 180000 yearly salary">
+
+        <label for="expenses">Expenses</label>
+        <input type="text" id="expenses" name="expenses" placeholder="example: 70000 yearly expenses">
+
+        <label for="liquidity_needs">Liquidity Needs</label>
+        <select id="liquidity_needs" name="liquidity_needs">
+            <option value="">-- Select liquidity need --</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Monthly liquidity required">Monthly liquidity required</option>
+        </select>
+
+        <h3>7. Mandate Constraints</h3>
+
+        <label for="legal">Legal / Product Restriction</label>
+        <select id="legal" name="legal">
+            <option value="">-- Select legal/product rule --</option>
+            <option value="UCITS">UCITS</option>
+            <option value="UCITS-compliant">UCITS-compliant</option>
+            <option value="Corporate policy prohibits equities">Corporate policy prohibits equities</option>
+            <option value="None">None</option>
+            <option value="Must include alternatives">Must include alternatives</option>
+        </select>
+
+        <label for="esg">ESG Rule</label>
+        <select id="esg" name="esg">
+            <option value="">-- Select ESG rule --</option>
+            <option value="Required">Required</option>
+            <option value="No tobacco">No tobacco</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Prefers clean energy">Prefers clean energy</option>
+        </select>
+
+        <label for="currency">Currency Rule</label>
+        <select id="currency" name="currency">
+            <option value="">-- Select currency rule --</option>
+            <option value="EUR only">EUR only</option>
+            <option value="CHF only">CHF only</option>
+            <option value="EUR base, FX allowed">EUR base, FX allowed</option>
+            <option value="USD, EUR, CHF">USD, EUR, CHF</option>
+            <option value="GBP base, global exposure allowed">GBP base, global exposure allowed</option>
+        </select>
+
+        <h3>8. Preferences, Behaviour and Mandate</h3>
+
+        <label for="investment_style">Investment Style</label>
+        <select id="investment_style" name="investment_style">
+            <option value="">-- Select investment style --</option>
+            <option value="Income-focused">Income-focused</option>
+            <option value="Passive">Passive</option>
+            <option value="Capital protection">Capital protection</option>
+            <option value="Thematic and opportunistic">Thematic and opportunistic</option>
+            <option value="Diversified and institutional">Diversified and institutional</option>
+        </select>
+
+        <label for="products">Preferred Products</label>
+        <select id="products" name="products">
+            <option value="">-- Select product preference --</option>
+            <option value="ETFs only">ETFs only</option>
+            <option value="Bond funds, Money-market funds">Bond funds, Money-market funds</option>
+            <option value="Money-market funds, Short-duration bonds">Money-market funds, Short-duration bonds</option>
+            <option value="Direct equities, Thematic ETFs">Direct equities, Thematic ETFs</option>
+            <option value="Hedge funds, Private equity, Real estate, ETFs">Hedge funds, Private equity, Real estate, ETFs</option>
+        </select>
+
+        <label for="communication">Communication Style</label>
+        <select id="communication" name="communication">
+            <option value="">-- Select communication style --</option>
+            <option value="Monthly, simplified reports">Monthly, simplified reports</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Monthly, detailed">Monthly, detailed</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Monthly plus quarterly deep-dive reports">Monthly plus quarterly deep-dive reports</option>
+        </select>
+
+        <label for="past_reactions">Past Market Reaction</label>
+        <select id="past_reactions" name="past_reactions">
+            <option value="">-- Select past reaction --</option>
+            <option value="Panicked during 2020 market crash">Panicked during 2020 market crash</option>
+            <option value="Stayed invested during downturns">Stayed invested during downturns</option>
+            <option value="Extremely risk-averse">Extremely risk-averse</option>
+            <option value="Buys aggressively during market dips">Buys aggressively during market dips</option>
+            <option value="Calm during crises">Calm during crises</option>
+        </select>
+
+        <label for="decision_style">Decision Style</label>
+        <select id="decision_style" name="decision_style">
+            <option value="">-- Select decision style --</option>
+            <option value="Hands-off">Hands-off</option>
+            <option value="Very involved">Very involved</option>
+            <option value="Collaborative">Collaborative</option>
+            <option value="Committee-based">Committee-based</option>
+        </select>
+
+        <label for="biases">Behavioural Biases</label>
+        <select id="biases" name="biases">
+            <option value="">-- Select behavioural bias --</option>
+            <option value="Loss aversion">Loss aversion</option>
+            <option value="Home bias toward domestic equities">Home bias toward domestic equities</option>
+            <option value="Cash bias">Cash bias</option>
+            <option value="Overconfidence">Overconfidence</option>
+            <option value="None significant">None significant</option>
+        </select>
+
+        <label for="mandate_type">Mandate Type</label>
+        <select id="mandate_type" name="mandate_type" required>
+            <option value="">-- Select mandate type --</option>
+            <option value="Discretionary">Discretionary</option>
+            <option value="Advisory">Advisory</option>
+        </select>
+
+        <label for="fees_percent">Fees (%)</label>
+        <select id="fees_percent" name="fees_percent">
+            <option value="">-- Select fee --</option>
+            <option value="0.4">0.4%</option>
+            <option value="0.6">0.6%</option>
+            <option value="0.8">0.8%</option>
+            <option value="1.0">1.0%</option>
+            <option value="1.2">1.2%</option>
+        </select>
+
+        <label for="rebalancing_frequency">Rebalancing Frequency</label>
+        <select id="rebalancing_frequency" name="rebalancing_frequency">
+            <option value="">-- Select rebalancing frequency --</option>
+            <option value="Monthly liquidity checks">Monthly liquidity checks</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Semi-annual">Semi-annual</option>
+            <option value="Opportunistic">Opportunistic</option>
+        </select>
+
+        <label for="ips">Investment Policy Statement Summary</label>
+        <textarea
+            id="ips"
+            name="ips"
+            rows="4"
+            placeholder="Write a short IPS summary for this portfolio"
+        ></textarea>
+
+        <button type="submit">Save Portfolio Profile</button>
+    </form>
+</div>
+
+<!-- ====================================================== -->
+<!-- EXISTING PORTFOLIO RECORDS                             -->
+<!-- ====================================================== -->
+
+<div class="card">
+    <h2>Saved Portfolio Profiles</h2>
+    <p class="muted">
+        These records are loaded from the Portfolio table. Each record displays normal
+        model columns plus the JSON profile_data sections.
+    </p>
+</div>
 
 {% for portfolio in portfolios %}
 
-    {% set profile = portfolio.profile_data %}
-
-    <!-- ================================================== -->
-    <!-- INDIVIDUAL PORTFOLIO CARD                          -->
-    <!-- ================================================== -->
+    {% set profile = portfolio.profile_data or {} %}
+    {% set identity = profile.identity or {} %}
+    {% set compliance = profile.compliance or {} %}
+    {% set objectives = profile.objectives or {} %}
+    {% set risk_profile = profile.risk_profile or {} %}
+    {% set financials = profile.financials or {} %}
+    {% set constraints = profile.constraints or {} %}
+    {% set preferences = profile.preferences or {} %}
+    {% set behavioural = profile.behavioural or {} %}
+    {% set mandate = profile.mandate or {} %}
 
     <div class="card">
-
-        <!-- ============================================== -->
-        <!-- PORTFOLIO HEADER INFORMATION                   -->
-        <!-- ============================================== -->
-
         <h2>{{ portfolio.display_name }}</h2>
 
-        <p>
-            <strong>Portfolio Key:</strong>
-            {{ portfolio.key }}
-        </p>
-
-        <p>
-            <strong>Client ID:</strong>
-            {{ portfolio.client_id }}
-        </p>
-
-        <p>
-            <strong>Reference Ticker / Benchmark Anchor:</strong>
-            {{ portfolio.benchmark_ticker }}
-        </p>
-
-        <p>
-            <strong>Portfolio Value:</strong>
-            {{ "{:,.0f}".format(portfolio.portfolio_value) }}
-        </p>
-
-        <!-- ============================================== -->
-        <!-- PORTFOLIO SUMMARY GRID                         -->
-        <!-- ============================================== -->
+        <div class="portfolio-summary">
+            <div>
+                <p><strong>Portfolio Key</strong></p>
+                <p>{{ portfolio.key }}</p>
+            </div>
+            <div>
+                <p><strong>Client ID</strong></p>
+                <p>{{ portfolio.client_id }}</p>
+            </div>
+            <div>
+                <p><strong>Benchmark</strong></p>
+                <p>{{ portfolio.benchmark_ticker }}</p>
+            </div>
+            <div>
+                <p><strong>Portfolio Value</strong></p>
+                <p>{{ "{:,.0f}".format(portfolio.portfolio_value) }}</p>
+            </div>
+        </div>
 
         <div class="portfolio-summary">
-
             <div>
                 <p><strong>Objective</strong></p>
-                <p>{{ profile.objectives.goals }}</p>
+                <p>{{ objectives.goals or "Not recorded" }}</p>
             </div>
-
             <div>
                 <p><strong>Risk Profile</strong></p>
-                <p>
-                    {{ profile.risk_profile.risk_tolerance }}
-                    /
-                    {{ profile.risk_profile.risk_capacity }}
-                </p>
+                <p>{{ risk_profile.risk_tolerance or "N/A" }} / {{ risk_profile.risk_capacity or "N/A" }}</p>
             </div>
-
             <div>
                 <p><strong>Max Drawdown</strong></p>
-                <p>{{ profile.risk_profile.max_drawdown_percent }}%</p>
+                <p>{{ risk_profile.max_drawdown_percent or "N/A" }}%</p>
             </div>
-
             <div>
-                <p><strong>Max Position Weight</strong></p>
-                <p>{{ portfolio.max_weight }}%</p>
+                <p><strong>Saved Holdings</strong></p>
+                <p>{{ portfolio.holdings | length }}</p>
             </div>
-
         </div>
 
-        <!-- ============================================== -->
-        <!-- IDENTITY AND ACCOUNT CONTROL                   -->
-        <!-- ============================================== -->
-
-        <button class="accordion" type="button">
-            Identity and Account Control
-        </button>
-
+        <button class="accordion" type="button">1. Identity and Account Control</button>
         <div class="panel">
-
             <ul>
-
-                {% for field, value in profile.identity.items() %}
-
-                    <li>
-                        <strong>
-                            {{ field.replace('_', ' ').title() }}:
-                        </strong>
-
-                        {# ------------------------------------- #}
-                        {# Strings display normally              #}
-                        {# Lists/tuples display joined           #}
-                        {# Numbers/booleans display normally     #}
-                        {# ------------------------------------- #}
-
-                        {% if value is string %}
-                            {{ value }}
-                        {% elif value is iterable %}
-                            {{ value | join(', ') }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </li>
-
+                {% for field, value in identity.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No identity details recorded.</li>
                 {% endfor %}
-
             </ul>
-
         </div>
 
-        <!-- ============================================== -->
-        <!-- COMPLIANCE REVIEW                              -->
-        <!-- ============================================== -->
-
-        <button class="accordion" type="button">
-            Compliance Review
-        </button>
-
+        <button class="accordion" type="button">2. Compliance Review</button>
         <div class="panel">
-
             <ul>
-
-                {% for field, value in profile.compliance.items() %}
-
-                    <li>
-                        <strong>
-                            {{ field.replace('_', ' ').title() }}:
-                        </strong>
-
-                        {% if value is string %}
-                            {{ value }}
-                        {% elif value is iterable %}
-                            {{ value | join(', ') }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </li>
-
+                {% for field, value in compliance.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No compliance details recorded.</li>
                 {% endfor %}
-
             </ul>
-
         </div>
 
-        <!-- ============================================== -->
-        <!-- MANDATE CONSTRAINTS                            -->
-        <!-- ============================================== -->
-
-        <button class="accordion" type="button">
-            Mandate Constraints
-        </button>
-
+        <button class="accordion" type="button">3. Investment Objectives</button>
         <div class="panel">
-
             <ul>
-
-                {% for field, value in profile.constraints.items() %}
-
-                    <li>
-                        <strong>
-                            {{ field.replace('_', ' ').title() }}:
-                        </strong>
-
-                        {% if value is string %}
-                            {{ value }}
-                        {% elif value is iterable %}
-                            {{ value | join(', ') }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </li>
-
+                {% for field, value in objectives.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No objective details recorded.</li>
                 {% endfor %}
-
             </ul>
-
         </div>
 
-        <!-- ============================================== -->
-        <!-- DATABASE RELATIONSHIP SECTION                  -->
-        <!-- Demonstrates SQLAlchemy relationship usage     -->
-        <!-- ============================================== -->
-
-        <button class="accordion" type="button">
-            Saved Holdings Relationship
-        </button>
-
+        <button class="accordion" type="button">4. Risk Review</button>
         <div class="panel">
-
-            <p>
-                This portfolio currently has
-                <strong>{{ portfolio.holdings | length }}</strong>
-                saved holding(s) stored in the
-                <strong>PortfolioHolding</strong> database table.
-            </p>
-
+            <ul>
+                {% for field, value in risk_profile.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No risk profile details recorded.</li>
+                {% endfor %}
+            </ul>
         </div>
 
+        <button class="accordion" type="button">5. Financial Position and Liquidity</button>
+        <div class="panel">
+            <ul>
+                {% for field, value in financials.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No financial details recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <button class="accordion" type="button">6. Mandate Constraints</button>
+        <div class="panel">
+            <ul>
+                {% for field, value in constraints.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No constraint details recorded.</li>
+                {% endfor %}
+                <li><strong>Maximum Position Weight:</strong> {{ portfolio.max_weight }}%</li>
+            </ul>
+        </div>
+
+        <button class="accordion" type="button">7. Preferences and Reporting Style</button>
+        <div class="panel">
+            <ul>
+                {% for field, value in preferences.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No preference details recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <button class="accordion" type="button">8. Behavioural Review</button>
+        <div class="panel">
+            <ul>
+                {% for field, value in behavioural.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No behavioural details recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <button class="accordion" type="button">9. Mandate Rules</button>
+        <div class="panel">
+            <ul>
+                {% for field, value in mandate.items() %}
+                    <li><strong>{{ field.replace('_', ' ').title() }}:</strong> {{ value if value is string else value | join(', ') if value is iterable else value }}</li>
+                {% else %}
+                    <li>No mandate details recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
+{% else %}
+    <div class="card">
+        <p class="muted">No portfolio profiles have been saved yet.</p>
+    </div>
 {% endfor %}
 
 {% endblock %}

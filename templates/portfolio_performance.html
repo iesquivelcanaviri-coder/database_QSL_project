@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}
+Portfolio Performance | PostgreSQL Portfolio App
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h1>Portfolio Performance Review</h1>
+
+    <p>
+        This page replaces the old criteria explanation page with a database-backed
+        portfolio performance dashboard. It compares portfolios using their saved holdings.
+    </p>
+
+    <p>
+        The purpose is to show which portfolios are doing well, which are mixed,
+        and which need review based on average score, expected return, volatility,
+        beta, allocation, and cash remaining.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Portfolio Performance Summary</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Portfolio</th>
+                <th>Benchmark</th>
+                <th>Positions</th>
+                <th>Total Allocated</th>
+                <th>Remaining Cash</th>
+                <th>Average Score</th>
+                <th>Average Return</th>
+                <th>Average Volatility</th>
+                <th>Average Beta</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in performance_rows %}
+                <tr class="{% if row.status == 'Performing well' %}score-high{% elif row.status == 'Mixed / monitor' %}score-medium{% elif row.status == 'Weak / needs review' %}score-low{% endif %}">
+                    <td>{{ row.portfolio_name }}</td>
+                    <td>{{ row.benchmark_ticker }}</td>
+                    <td>{{ row.position_count }}</td>
+                    <td>{{ row.total_allocated_percent }}%</td>
+                    <td>{{ row.remaining_cash_percent }}%</td>
+                    <td>{{ row.average_score if row.average_score is not none else "N/A" }}</td>
+                    <td>
+                        {{ row.average_expected_return if row.average_expected_return is not none else "N/A" }}
+                        {% if row.average_expected_return is not none %}%{% endif %}
+                    </td>
+                    <td>
+                        {{ row.average_volatility if row.average_volatility is not none else "N/A" }}
+                        {% if row.average_volatility is not none %}%{% endif %}
+                    </td>
+                    <td>{{ row.average_beta if row.average_beta is not none else "N/A" }}</td>
+                    <td><strong>{{ row.status }}</strong></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="10">No portfolio performance data is available yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>Interpretation Guide</h2>
+
+    <div class="portfolio-summary">
+        <div>
+            <p><strong>Performing well</strong></p>
+            <p>Average holding score is strong and the portfolio has several suitable positions.</p>
+        </div>
+
+        <div>
+            <p><strong>Mixed / monitor</strong></p>
+            <p>Some holdings are acceptable, but the portfolio may need further review.</p>
+        </div>
+
+        <div>
+            <p><strong>Weak / needs review</strong></p>
+            <p>Average score is low or holdings do not strongly support the mandate.</p>
+        </div>
+
+        <div>
+            <p><strong>No holdings yet</strong></p>
+            <p>The portfolio needs securities added from the Market Dashboard.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Saved Holdings by Portfolio</h2>
+
+    <p class="muted">
+        This section is read from the PortfolioHolding table. Delete buttons demonstrate
+        the DELETE part of CRUD.
+    </p>
+
+    <div id="portfolio-groups"></div>
+</div>
+
+{% endblock %}
