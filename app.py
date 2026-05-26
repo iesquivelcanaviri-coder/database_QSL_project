@@ -81,12 +81,6 @@ class PortfolioHolding(db.Model):
     volatility_1y = db.Column(db.Float, nullable=True)
     sharpe_like_1y = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-        nullable=False,
-    )
 
     __table_args__ = (
         UniqueConstraint("portfolio_id", "ticker", name="unique_portfolio_ticker"),
@@ -110,8 +104,6 @@ class PortfolioHolding(db.Model):
             "expected_return_1y": self.expected_return_1y,
             "volatility_1y": self.volatility_1y,
             "sharpe_like_1y": self.sharpe_like_1y,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
 
@@ -494,27 +486,145 @@ def get_portfolio_display_name(portfolio_dict):
     return identity.get("name") or identity.get("company_name") or portfolio_dict.get("client_id", "Unknown Portfolio")
 
 
-def make_profile_data(name, client_type, risk_profile, objective, currency, benchmark_ticker, max_weight):
-    """Build a JSON profile for a newly created portfolio from form dropdowns."""
-    is_company = client_type == "Corporate / Family Office"
-    identity = (
-        {
-            "company_name": name,
-            "residency": "To be confirmed",
-            "ownership": client_type,
-            "signatories": ["To be confirmed"],
+
+def clean_form_value(field_name, default="Not recorded"):
+    """Return a trimmed form value or a safe default."""
+    value = request.form.get(field_name, "")
+    value = value.strip() if isinstance(value, str) else value
+    return value if value not in ("", None) else default
+
+
+def clean_float(field_name, default=0.0):
+    """Return a numeric form value without breaking if the field is empty."""
+    try:
+        return float(request.form.get(field_name) or default)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def split_selected_list(value):
+    """Convert comma-separated select values into a clean list."""
+    if not value:
+        return []
+    return [item.strip() for item in str(value).split(",") if item.strip()]
+
+
+def get_next_client_number():
+    """Return the next available automated client number.
+
+    Example:
+    - existing client_1, client_2, client_3
+    - next generated value becomes client_4
+
+    If old records still use scenario1/scenario2 keys, the function falls back
+    to total portfolio count + 1 so the next record does not restart at client_1.
+    """
+    portfolios = Portfolio.query.all()
+    highest_client_number = 0
+
+    for portfolio in portfolios:
+        for value in [portfolio.key, portfolio.client_id]:
+            match = re.search(r"client[_\s-]*(\d+)", str(value).lower())
+            if match:
+                highest_client_number = max(highest_client_number, int(match.group(1)))
+
+    if highest_client_number > 0:
+        return highest_client_number + 1
+
+    return len(portfolios) + 1
+
+
+def build_profile_data_from_form():
+    """Build the profile_data JSON object from the easy portfolio profile form."""
+    client_type = clean_form_value("client_type", "Individual")
+    display_name = clean_form_value("display_name", "Unnamed Portfolio")
+
+    if client_type in ["Corporate", "Family Office", "Trust"]:
+        identity = {
+            "company_name": clean_form_value("client_name", display_name),
+            "entity_type": client_type,
+            "incorporation_year": clean_form_value("date_of_birth", "Not recorded"),
+            "residency": clean_form_value("nationality", "Not recorded"),
+            "tax_residency": clean_form_value("tax_residency", "Not recorded"),
+            "address_or_location": clean_form_value("address", "Not recorded"),
+            "identification": clean_form_value("identification", "Not recorded"),
         }
-        if is_company
-        else {
-            "name": name,
-            "nationality": "To be confirmed",
-            "tax_residency": "To be confirmed",
-            "identification": "To be confirmed",
+    else:
+        identity = {
+            "name": clean_form_value("client_name", display_name),
+            "client_type": client_type,
+            "date_of_birth": clean_form_value("date_of_birth", "Not recorded"),
+            "nationality": clean_form_value("nationality", "Not recorded"),
+            "tax_residency": clean_form_value("tax_residency", "Not recorded"),
+            "address": clean_form_value("address", "Not recorded"),
+            "identification": clean_form_value("identification", "Not recorded"),
         }
-    )
 
     return {
         "identity": identity,
+        "compliance": {
+            "kyc": clean_form_value("kyc", "Pending"),
+            "aml": clean_form_value("aml", "Pending review"),
+            "source_of_wealth": clean_form_value("source_of_wealth", "Not recorded"),
+            "source_of_funds": clean_form_value("source_of_funds", "Not recorded"),
+            "fatca_crs": clean_form_value("fatca_crs", "Not recorded"),
+            "pep": clean_form_value("pep", "Not recorded"),
+        },
+        "objectives": {
+            "goals": clean_form_value("goals", "Balanced growth"),
+            "time_horizon_years": clean_form_value("time_horizon_years", "Not recorded"),
+            "expected_return_percent": clean_form_value("expected_return_percent", "Not recorded"),
+            "benchmark": clean_form_value("benchmark", clean_form_value("benchmark_ticker", "ACWI")),
+        },
+        "risk_profile": {
+            "risk_tolerance": clean_form_value("risk_tolerance", "Balanced"),
+            "risk_capacity": clean_form_value("risk_capacity", "Medium"),
+            "max_drawdown_percent": clean_float("max_drawdown_percent", -15),
+        },
+        "financials": {
+            "net_worth": clean_float("net_worth", 0),
+            "investments": clean_float("investments", 0),
+            "real_estate": clean_form_value("real_estate", "Not recorded"),
+            "liabilities": clean_float("liabilities", 0),
+            "income": clean_form_value("income", "Not recorded"),
+            "expenses": clean_form_value("expenses", "Not recorded"),
+            "liquidity_needs": clean_form_value("liquidity_needs", "Not recorded"),
+        },
+        "constraints": {
+            "legal": clean_form_value("legal", "Not recorded"),
+            "esg": clean_form_value("esg", "Not recorded"),
+            "currency": clean_form_value("currency", "Not recorded"),
+            "max_position_weight_percent": clean_float("max_weight", 10),
+        },
+        "preferences": {
+            "investment_style": clean_form_value("investment_style", "Not recorded"),
+            "products": split_selected_list(clean_form_value("products", "")),
+            "communication": clean_form_value("communication", "Not recorded"),
+        },
+        "behavioural": {
+            "past_reactions": clean_form_value("past_reactions", "Not recorded"),
+            "decision_style": clean_form_value("decision_style", "Not recorded"),
+            "biases": split_selected_list(clean_form_value("biases", "")),
+        },
+        "mandate": {
+            "type": clean_form_value("mandate_type", "Advisory"),
+            "fees_percent": clean_float("fees_percent", 0.0),
+            "rebalancing_frequency": clean_form_value("rebalancing_frequency", "Quarterly"),
+            "ips": clean_form_value("ips", "Not recorded"),
+        },
+    }
+
+
+def make_profile_data(name, client_type, risk_profile, objective, currency, benchmark_ticker, max_weight):
+    """Backward-compatible wrapper used only if older code calls this function."""
+    return {
+        "identity": {
+            "name": name,
+            "client_type": client_type,
+            "nationality": "To be confirmed",
+            "tax_residency": "To be confirmed",
+            "identification": "To be confirmed",
+        },
         "compliance": {
             "kyc": "Pending",
             "aml": "Pending review",
@@ -564,14 +674,20 @@ def make_profile_data(name, client_type, risk_profile, objective, currency, benc
 
 
 def seed_default_portfolios():
-    """Insert the original default portfolio scenarios if the database is empty."""
+    """Insert the default portfolio scenarios if the database is empty.
+
+    The default records now use automated client-style keys:
+    client_1, client_2, client_3, etc.
+    """
     if Portfolio.query.first():
         return
 
-    for key, profile in PORTFOLIOS.items():
+    for number, (_, profile) in enumerate(PORTFOLIOS.items(), start=1):
+        automated_key = f"client_{number}"
+
         portfolio = Portfolio(
-            key=key,
-            client_id=profile["client_id"],
+            key=automated_key,
+            client_id=automated_key,
             display_name=get_portfolio_display_name(profile),
             benchmark_ticker=profile.get("ticker", "SPY"),
             portfolio_value=float(profile.get("portfolio_value", 0)),
@@ -581,6 +697,7 @@ def seed_default_portfolios():
         db.session.add(portfolio)
 
     db.session.commit()
+
 
 
 def get_portfolio_choices():
@@ -808,26 +925,45 @@ def score_and_decide(expected_return, volatility, sharpe_like, beta):
 
 
 def validate_portfolio_addition(portfolio, ticker, recommended_weight, sector, industry):
-    """Allow any selected stock or ETF to be assigned to any portfolio.
+    """Validate whether a proposed holding is allowed inside the selected portfolio."""
+    errors = []
+    warnings = []
 
-    This version removes blocking validation rules. It still calculates the
-    recommended weight as a decimal so the holding can be saved and used in
-    portfolio performance calculations.
-
-    Removed blocking checks:
-    - maximum position weight
-    - total allocation above 100%
-    - equity restrictions
-    - ESG/tobacco restrictions
-    - currency warnings
-    """
     weight_decimal = parse_weight_to_decimal(recommended_weight)
+    weight_percent = weight_decimal * 100
+    max_weight_allowed = get_effective_max_weight(portfolio)
 
-    return {
-        "errors": [],
-        "warnings": [],
-        "weight_decimal": weight_decimal,
-    }
+    if max_weight_allowed is not None and weight_percent > max_weight_allowed:
+        errors.append(f"Recommended weight of {weight_percent:.2f}% exceeds the portfolio limit of {max_weight_allowed:.2f}%.")
+
+    current_total_excluding_same_ticker = sum(
+        h.weight_decimal or 0.0
+        for h in portfolio.holdings
+        if h.ticker != ticker
+    )
+
+    projected_total = current_total_excluding_same_ticker + weight_decimal
+    if projected_total > 1.0:
+        errors.append(f"Projected total allocation would be {projected_total * 100:.2f}%, which exceeds 100%.")
+
+    constraints = (portfolio.profile_data or {}).get("constraints", {})
+    legal_rule = str(constraints.get("legal", "")).lower()
+
+    if "prohibits equities" in legal_rule:
+        fixed_income_tickers = {"IEF", "SHY", "AGG", "BND", "TIP"}
+        if ticker not in fixed_income_tickers:
+            errors.append("This mandate prohibits equities. Only fixed-income style instruments should be added.")
+
+    esg_rule = str(constraints.get("esg", "")).lower()
+    if "no tobacco" in esg_rule:
+        if "tobacco" in str(sector).lower() or "tobacco" in str(industry).lower():
+            errors.append("This mandate excludes tobacco-related exposure.")
+
+    currency_rule = constraints.get("currency")
+    if currency_rule in ["EUR only", "CHF only"]:
+        warnings.append(f"Manual currency review recommended because this mandate states {currency_rule}.")
+
+    return {"errors": errors, "warnings": warnings, "weight_decimal": weight_decimal}
 
 
 def analyze_stock(ticker, benchmark_ticker, portfolio_key):
@@ -1087,40 +1223,28 @@ def home():
 @app.route("/portfolio_profiles", methods=["GET", "POST"])
 def portfolio_profiles():
     if request.method == "POST":
-        name = request.form.get("display_name", "").strip()
-        client_type = request.form.get("client_type", "Individual")
-        risk_profile = request.form.get("risk_profile", "Balanced")
-        objective = request.form.get("objective", "Balanced growth")
-        currency = request.form.get("currency", "EUR base, global exposure allowed")
-        benchmark_ticker = request.form.get("benchmark_ticker", "ACWI").strip().upper()
-        portfolio_value = float(request.form.get("portfolio_value") or 0)
-        max_weight = float(request.form.get("max_weight") or 10)
+        display_name = clean_form_value("display_name", "").strip()
+        benchmark_ticker = clean_form_value("benchmark_ticker", "ACWI").upper()
+        portfolio_value = clean_float("portfolio_value", 0)
+        max_weight = clean_float("max_weight", 10)
 
-        if not name:
+        if not display_name:
             flash("Portfolio name is required.", "error")
             return redirect(url_for("portfolio_profiles"))
 
-        key_base = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "portfolio"
-        key = key_base
-        counter = 1
-        while Portfolio.query.filter_by(key=key).first():
-            counter += 1
-            key = f"{key_base}_{counter}"
+        client_number = get_next_client_number()
+        automated_key = f"client_{client_number}"
 
-        profile_data = make_profile_data(
-            name=name,
-            client_type=client_type,
-            risk_profile=risk_profile,
-            objective=objective,
-            currency=currency,
-            benchmark_ticker=benchmark_ticker,
-            max_weight=max_weight,
-        )
+        while Portfolio.query.filter_by(key=automated_key).first() or Portfolio.query.filter_by(client_id=automated_key).first():
+            client_number += 1
+            automated_key = f"client_{client_number}"
+
+        profile_data = build_profile_data_from_form()
 
         portfolio = Portfolio(
-            key=key,
-            client_id=f"custom_{key}",
-            display_name=name,
+            key=automated_key,
+            client_id=automated_key,
+            display_name=display_name,
             benchmark_ticker=benchmark_ticker,
             portfolio_value=portfolio_value,
             max_weight=max_weight,
@@ -1130,13 +1254,15 @@ def portfolio_profiles():
         db.session.add(portfolio)
         db.session.commit()
 
-        flash("New portfolio profile saved to the database.", "success")
+        flash(f"New portfolio profile saved as {automated_key}.", "success")
         return redirect(url_for("portfolio_profiles"))
 
+    next_client_number = get_next_client_number()
     return render_template(
         "portfolio_profiles.html",
         active_page="portfolio_profiles",
         portfolios=Portfolio.query.order_by(Portfolio.id).all(),
+        next_client_key=f"client_{next_client_number}",
     )
 
 
@@ -1220,84 +1346,54 @@ def analyze():
 
 @app.route("/add-to-portfolio", methods=["POST"])
 def add_to_portfolio():
-    """Analyse a selected ticker and save or update it as a portfolio holding.
+    data = request.get_json(force=True)
 
-    This route is called from the Market Dashboard page by JavaScript.
-    It returns JSON in both success and error cases so the page can show
-    a useful message instead of a generic failure.
-    """
-    try:
-        data = request.get_json(force=True)
+    ticker = data.get("ticker", "").strip().upper()
+    portfolio_key = data.get("portfolio_key", "").strip()
+    portfolio = get_portfolio_by_key(portfolio_key)
 
-        ticker = data.get("ticker", "").strip().upper()
-        portfolio_key = data.get("portfolio_key", "").strip()
-        portfolio = get_portfolio_by_key(portfolio_key)
+    if not ticker or not portfolio:
+        return jsonify({"error": "Invalid stock or portfolio."}), 400
 
-        if not ticker or not portfolio:
-            return jsonify({"error": "Invalid stock or portfolio."}), 400
+    analysis = analyze_stock(ticker, portfolio.benchmark_ticker, portfolio.key)
+    validation = validate_portfolio_addition(
+        portfolio=portfolio,
+        ticker=ticker,
+        recommended_weight=analysis["recommended_weight"],
+        sector=analysis["sector"],
+        industry=analysis["industry"],
+    )
 
-        analysis = analyze_stock(ticker, portfolio.benchmark_ticker, portfolio.key)
+    if validation["errors"]:
+        return jsonify({"error": validation["errors"], "warnings": validation["warnings"]}), 400
 
-        validation = validate_portfolio_addition(
-            portfolio=portfolio,
-            ticker=ticker,
-            recommended_weight=analysis["recommended_weight"],
-            sector=analysis["sector"],
-            industry=analysis["industry"],
-        )
+    holding = PortfolioHolding.query.filter_by(portfolio_id=portfolio.id, ticker=ticker).first()
+    if not holding:
+        holding = PortfolioHolding(portfolio_id=portfolio.id, ticker=ticker)
+        db.session.add(holding)
+        message = f"{ticker} added to {portfolio.display_name}."
+    else:
+        message = f"{ticker} updated in {portfolio.display_name}."
 
-        if validation["errors"]:
-            return jsonify({
-                "error": validation["errors"],
-                "warnings": validation["warnings"],
-            }), 400
+    holding.recommended_weight = analysis["recommended_weight"]
+    holding.weight_decimal = validation["weight_decimal"]
+    holding.decision = analysis["decision"]
+    holding.tag = analysis["tag"]
+    holding.sector = analysis["sector"]
+    holding.industry = analysis["industry"]
+    holding.beta = analysis["beta"]
+    holding.score = analysis["score"]
+    holding.expected_return_1y = analysis["one_year"]["annualised_expected_return"]
+    holding.volatility_1y = analysis["one_year"]["annualised_volatility"]
+    holding.sharpe_like_1y = analysis["one_year"]["sharpe_like"]
 
-        holding = PortfolioHolding.query.filter_by(
-            portfolio_id=portfolio.id,
-            ticker=ticker,
-        ).first()
+    db.session.commit()
 
-        if not holding:
-            now = datetime.utcnow()
-            holding = PortfolioHolding(
-                portfolio_id=portfolio.id,
-                ticker=ticker,
-                recommended_weight=analysis["recommended_weight"],
-                weight_decimal=validation["weight_decimal"],
-                decision=analysis["decision"],
-                created_at=now,
-                updated_at=now,
-            )
-            db.session.add(holding)
-            message = f"{ticker} added to {portfolio.display_name}."
-        else:
-            message = f"{ticker} updated in {portfolio.display_name}."
-
-        holding.recommended_weight = analysis["recommended_weight"]
-        holding.weight_decimal = validation["weight_decimal"]
-        holding.decision = analysis["decision"]
-        holding.tag = analysis["tag"]
-        holding.sector = analysis["sector"]
-        holding.industry = analysis["industry"]
-        holding.beta = analysis["beta"]
-        holding.score = analysis["score"]
-        holding.expected_return_1y = analysis["one_year"]["annualised_expected_return"]
-        holding.volatility_1y = analysis["one_year"]["annualised_volatility"]
-        holding.sharpe_like_1y = analysis["one_year"]["sharpe_like"]
-        holding.updated_at = datetime.utcnow()
-
-        db.session.commit()
-
-        return jsonify({
-            "message": message,
-            "warnings": validation["warnings"],
-            "portfolio": build_grouped_portfolio_payload(),
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print("ADD TO PORTFOLIO ERROR:", e)
-        return jsonify({"error": f"Could not save holding: {str(e)}"}), 500
+    return jsonify({
+        "message": message,
+        "warnings": validation["warnings"],
+        "portfolio": build_grouped_portfolio_payload(),
+    })
 
 
 @app.route("/portfolio-stocks")

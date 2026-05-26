@@ -6,454 +6,346 @@ Portfolio Profiles | PostgreSQL Portfolio App
 
 {% block content %}
 
-<!-- ====================================================== -->
-<!-- PAGE INTRODUCTION                                      -->
-<!-- ====================================================== -->
-
 <div class="card">
     <h1>Portfolio Profiles and Client Mandate Records</h1>
 
     <p>
-        This page demonstrates the <strong>Create</strong> and <strong>Read</strong>
-        parts of CRUD for the <strong>Portfolio</strong> database model.
+        This page is the <strong>Create</strong> and <strong>Read</strong> area for the
+        <strong>Portfolio</strong> database table. Create a client portfolio profile here,
+        then assign holdings from the Market Dashboard.
     </p>
 
-    <p>
-        Use the form below to create a new client portfolio profile. The information
-        is saved into PostgreSQL through Flask-SQLAlchemy using the
-        <strong>profile_data</strong> JSON field.
+    <p class="muted">
+        The portfolio key and client ID are generated automatically. The next saved profile will be:
+        <strong>{{ next_client_key }}</strong>.
     </p>
 </div>
-
-<!-- ====================================================== -->
-<!-- CREATE NEW PORTFOLIO PROFILE FORM                      -->
-<!-- The field names match build_profile_data_from_form()    -->
-<!-- in app.py                                               -->
-<!-- ====================================================== -->
 
 <div class="card">
     <h2>Create a New Portfolio Profile</h2>
 
+    <p class="muted">
+        Only portfolio-manager-relevant fields are included. Each field has a short explanation directly
+        under the question, followed by the input to complete.
+    </p>
+
     <form method="post" action="{{ url_for('portfolio_profiles') }}">
 
-        <h3>1. Portfolio Record</h3>
+        <h3>1. Client and Portfolio Basics</h3>
 
-        <label for="key">Portfolio Key</label>
-        <input
-            type="text"
-            id="key"
-            name="key"
-            placeholder="example: james_oconnor_growth"
-            required
-        >
+        <div class="form-grid">
+            <div>
+                <label for="display_name">Portfolio / Client Display Name</label>
+                <p class="muted">This is the name shown across the app, tables, and portfolio performance page.</p>
+                <input
+                    type="text"
+                    id="display_name"
+                    name="display_name"
+                    placeholder="Example: James O'Connor Growth Portfolio"
+                    required
+                >
+            </div>
 
-        <label for="client_id">Client ID</label>
-        <input
-            type="text"
-            id="client_id"
-            name="client_id"
-            placeholder="example: client_006_james_oconnor"
-            required
-        >
+            <div>
+                <label for="client_name">Client / Entity Name</label>
+                <p class="muted">Enter the person, company, family office, or trust name.</p>
+                <input
+                    type="text"
+                    id="client_name"
+                    name="client_name"
+                    placeholder="Example: James O'Connor"
+                    required
+                >
+            </div>
 
-        <label for="display_name">Display Name</label>
-        <input
-            type="text"
-            id="display_name"
-            name="display_name"
-            placeholder="example: James O'Connor"
-            required
-        >
+            <div>
+                <label for="client_type">Client Type</label>
+                <p class="muted">Select the account type so the profile can be interpreted correctly.</p>
+                <select id="client_type" name="client_type" required>
+                    <option value="">-- Select client type --</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Corporate">Corporate</option>
+                    <option value="Family Office">Family Office</option>
+                    <option value="Trust">Trust</option>
+                </select>
+            </div>
 
-        <label for="benchmark_ticker">Benchmark / Reference Ticker</label>
-        <select id="benchmark_ticker" name="benchmark_ticker" required>
-            <option value="">-- Select benchmark --</option>
-            <option value="ACWI">ACWI — Global Equity</option>
-            <option value="SPY">SPY — S&amp;P 500</option>
-            <option value="QQQ">QQQ — Nasdaq 100</option>
-            <option value="IEF">IEF — US 7-10 Year Treasury</option>
-            <option value="SHY">SHY — Short-Term Treasury</option>
-            <option value="AGG">AGG — Aggregate Bond</option>
-            <option value="AOR">AOR — Balanced Allocation ETF</option>
-        </select>
+            <div>
+                <label for="portfolio_value">Portfolio Value</label>
+                <p class="muted">Approximate investable amount or mandate size.</p>
+                <input
+                    type="number"
+                    id="portfolio_value"
+                    name="portfolio_value"
+                    min="0"
+                    step="1000"
+                    placeholder="Example: 600000"
+                    required
+                >
+            </div>
+        </div>
 
-        <label for="portfolio_value">Portfolio Value</label>
-        <input
-            type="number"
-            id="portfolio_value"
-            name="portfolio_value"
-            min="0"
-            step="1000"
-            placeholder="example: 600000"
-            required
-        >
+        <h3>2. Investment Objective and Risk</h3>
 
-        <label for="max_weight">Maximum Position Weight (%)</label>
-        <select id="max_weight" name="max_weight" required>
-            <option value="">-- Select maximum weight --</option>
-            <option value="5">5%</option>
-            <option value="10">10%</option>
-            <option value="15">15%</option>
-            <option value="20">20%</option>
-        </select>
+        <div class="form-grid">
+            <div>
+                <label for="goals">Investment Goal</label>
+                <p class="muted">Choose the main purpose of the portfolio.</p>
+                <select id="goals" name="goals" required>
+                    <option value="">-- Select investment goal --</option>
+                    <option value="Capital preservation and stable income">Capital preservation and stable income</option>
+                    <option value="Preserve capital and earn yield">Preserve capital and earn yield</option>
+                    <option value="Preserve wealth and achieve moderate growth">Preserve wealth and achieve moderate growth</option>
+                    <option value="Long-term growth">Long-term growth</option>
+                    <option value="Growth and diversification">Growth and diversification</option>
+                </select>
+            </div>
 
-        <h3>2. Identity and Account Control</h3>
+            <div>
+                <label for="time_horizon_years">Time Horizon</label>
+                <p class="muted">How long the client expects to keep this portfolio invested.</p>
+                <select id="time_horizon_years" name="time_horizon_years" required>
+                    <option value="">-- Select time horizon --</option>
+                    <option value="1-3">1-3 years</option>
+                    <option value="5-7">5-7 years</option>
+                    <option value="10+">10+ years</option>
+                    <option value="15+">15+ years</option>
+                    <option value="30+">30+ years</option>
+                </select>
+            </div>
 
-        <label for="client_type">Client Type</label>
-        <select id="client_type" name="client_type" required>
-            <option value="">-- Select client type --</option>
-            <option value="Individual">Individual</option>
-            <option value="Corporate">Corporate</option>
-            <option value="Family Office">Family Office</option>
-            <option value="Trust">Trust</option>
-        </select>
+            <div>
+                <label for="risk_tolerance">Risk Tolerance</label>
+                <p class="muted">How much investment risk the client is willing to accept emotionally.</p>
+                <select id="risk_tolerance" name="risk_tolerance" required>
+                    <option value="">-- Select risk tolerance --</option>
+                    <option value="Very low">Very low</option>
+                    <option value="Conservative">Conservative</option>
+                    <option value="Balanced">Balanced</option>
+                    <option value="Growth">Growth</option>
+                    <option value="Aggressive">Aggressive</option>
+                </select>
+            </div>
 
-        <label for="client_name">Client / Entity Name</label>
-        <input
-            type="text"
-            id="client_name"
-            name="client_name"
-            placeholder="example: James O'Connor"
-            required
-        >
+            <div>
+                <label for="risk_capacity">Risk Capacity</label>
+                <p class="muted">How much loss the client can financially absorb.</p>
+                <select id="risk_capacity" name="risk_capacity" required>
+                    <option value="">-- Select risk capacity --</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Very high">Very high</option>
+                </select>
+            </div>
 
-        <label for="date_of_birth">Date of Birth / Incorporation Year</label>
-        <input
-            type="text"
-            id="date_of_birth"
-            name="date_of_birth"
-            placeholder="example: 1981-07-04 or 2012"
-        >
+            <div>
+                <label for="max_drawdown_percent">Maximum Drawdown (%)</label>
+                <p class="muted">Largest fall the client could tolerate before the portfolio needs review.</p>
+                <select id="max_drawdown_percent" name="max_drawdown_percent" required>
+                    <option value="">-- Select max drawdown --</option>
+                    <option value="-3">-3%</option>
+                    <option value="-8">-8%</option>
+                    <option value="-15">-15%</option>
+                    <option value="-20">-20%</option>
+                    <option value="-30">-30%</option>
+                </select>
+            </div>
 
-        <label for="nationality">Nationality / Residency</label>
-        <input
-            type="text"
-            id="nationality"
-            name="nationality"
-            placeholder="example: Irish"
-        >
+            <div>
+                <label for="expected_return_percent">Expected Return (%)</label>
+                <p class="muted">Target return range for the mandate. This is not a guarantee.</p>
+                <select id="expected_return_percent" name="expected_return_percent" required>
+                    <option value="">-- Select expected return --</option>
+                    <option value="1-2">1-2%</option>
+                    <option value="2-3">2-3%</option>
+                    <option value="5-7">5-7%</option>
+                    <option value="6-8">6-8%</option>
+                    <option value="8-12">8-12%</option>
+                </select>
+            </div>
+        </div>
 
-        <label for="tax_residency">Tax Residency</label>
-        <input
-            type="text"
-            id="tax_residency"
-            name="tax_residency"
-            placeholder="example: Ireland"
-        >
+        <h3>3. Benchmark and Portfolio Rules</h3>
 
-        <label for="address">Address / Location</label>
-        <input
-            type="text"
-            id="address"
-            name="address"
-            placeholder="example: Dublin, Ireland"
-        >
+        <div class="form-grid">
+            <div>
+                <label for="benchmark_ticker">Benchmark / Reference Ticker</label>
+                <p class="muted">Client’s reference market/index. The app uses this ticker to compare each selected stock or ETF against the client’s portfolio benchmark and to calculate beta. Example: use ACWI for a global equity client, SPY for a US equity client, or IEF/SHY for a bond-focused client.</p>
+                <select id="benchmark_ticker" name="benchmark_ticker" required>
+                    <option value="">-- Select benchmark --</option>
+                    <option value="ACWI">ACWI — Global Equity</option>
+                    <option value="SPY">SPY — S&amp;P 500</option>
+                    <option value="QQQ">QQQ — Nasdaq 100</option>
+                    <option value="IEF">IEF — US 7-10 Year Treasury</option>
+                    <option value="SHY">SHY — Short-Term Treasury</option>
+                    <option value="AGG">AGG — Aggregate Bond</option>
+                    <option value="AOR">AOR — Balanced Allocation ETF</option>
+                </select>
+            </div>
 
-        <label for="identification">Identification</label>
-        <select id="identification" name="identification">
-            <option value="">-- Select identification type --</option>
-            <option value="Passport">Passport</option>
-            <option value="National ID">National ID</option>
-            <option value="Company Registration">Company Registration</option>
-            <option value="Trust Deed">Trust Deed</option>
-        </select>
+            <div>
+                <label for="benchmark">Benchmark Description</label>
+                <p class="muted">Client’s benchmark written in normal language for the saved profile. This should match the benchmark ticker above. Example: if the ticker is ACWI, choose MSCI ACWI; if the client has a balanced mandate, choose 40/60 global portfolio.</p>
+                <select id="benchmark" name="benchmark" required>
+                    <option value="">-- Select benchmark description --</option>
+                    <option value="Eurozone government bond index">Eurozone government bond index</option>
+                    <option value="MSCI World">MSCI World</option>
+                    <option value="CHF money-market index">CHF money-market index</option>
+                    <option value="MSCI ACWI">MSCI ACWI</option>
+                    <option value="40/60 global portfolio">40/60 global portfolio</option>
+                </select>
+            </div>
 
-        <h3>3. Compliance Review</h3>
+            <div>
+                <label for="max_weight">Maximum Position Weight (%)</label>
+                <p class="muted">Client’s maximum allocation to one individual holding. This helps show concentration risk. Example: conservative or corporate clients may use 5%; diversified private clients may use 10%; aggressive clients may allow 15% or 20%.</p>
+                <select id="max_weight" name="max_weight" required>
+                    <option value="">-- Select maximum weight --</option>
+                    <option value="5">5% — strict mandate</option>
+                    <option value="10">10% — standard diversified limit</option>
+                    <option value="15">15% — flexible mandate</option>
+                    <option value="20">20% — concentrated mandate</option>
+                </select>
+            </div>
 
-        <label for="kyc">KYC Status</label>
-        <select id="kyc" name="kyc" required>
-            <option value="">-- Select KYC status --</option>
-            <option value="Completed">Completed</option>
-            <option value="Pending">Pending</option>
-            <option value="Requires Review">Requires Review</option>
-        </select>
+            <div>
+                <label for="currency">Currency Rule</label>
+                <p class="muted">Client’s base currency and whether foreign-currency exposure is acceptable. Example: choose EUR only if the client wants no FX exposure; choose EUR base, FX allowed if the client reports in EUR but can hold USD/global assets.</p>
+                <select id="currency" name="currency">
+                    <option value="">-- Select currency rule --</option>
+                    <option value="EUR only">EUR only</option>
+                    <option value="CHF only">CHF only</option>
+                    <option value="EUR base, FX allowed">EUR base, FX allowed</option>
+                    <option value="USD, EUR, CHF">USD, EUR, CHF</option>
+                    <option value="GBP base, global exposure allowed">GBP base, global exposure allowed</option>
+                </select>
+            </div>
 
-        <label for="aml">AML Status</label>
-        <select id="aml" name="aml" required>
-            <option value="">-- Select AML status --</option>
-            <option value="No issues">No issues</option>
-            <option value="Clean">Clean</option>
-            <option value="Requires Enhanced Due Diligence">Requires Enhanced Due Diligence</option>
-        </select>
+            <div>
+                <label for="legal">Product Restriction</label>
+                <p class="muted">Client’s product or mandate restriction. Use this to record what the portfolio manager should respect when selecting investments. Example: UCITS for European-regulated funds, Corporate policy prohibits equities for treasury clients, or None if there is no special restriction.</p>
+                <select id="legal" name="legal">
+                    <option value="">-- Select product rule --</option>
+                    <option value="UCITS">UCITS</option>
+                    <option value="UCITS-compliant">UCITS-compliant</option>
+                    <option value="Corporate policy prohibits equities">Corporate policy prohibits equities</option>
+                    <option value="None">None</option>
+                    <option value="Must include alternatives">Must include alternatives</option>
+                </select>
+            </div>
 
-        <label for="source_of_wealth">Source of Wealth</label>
-        <select id="source_of_wealth" name="source_of_wealth">
-            <option value="">-- Select source of wealth --</option>
-            <option value="Salary and bonuses">Salary and bonuses</option>
-            <option value="Pension and inheritance">Pension and inheritance</option>
-            <option value="Business sale">Business sale</option>
-            <option value="Operating profits">Operating profits</option>
-            <option value="Real estate and private equity">Real estate and private equity</option>
-        </select>
+            <div>
+                <label for="esg">ESG Rule</label>
+                <p class="muted">Client’s sustainability preference or exclusion rule. Example: Required means ESG must be considered; No tobacco means tobacco-related holdings should be avoided; Neutral means no specific ESG preference.</p>
+                <select id="esg" name="esg">
+                    <option value="">-- Select ESG rule --</option>
+                    <option value="Required">Required</option>
+                    <option value="No tobacco">No tobacco</option>
+                    <option value="Neutral">Neutral</option>
+                    <option value="Prefers clean energy">Prefers clean energy</option>
+                </select>
+            </div>
+        </div>
 
-        <label for="source_of_funds">Source of Funds</label>
-        <select id="source_of_funds" name="source_of_funds">
-            <option value="">-- Select source of funds --</option>
-            <option value="Corporate employment">Corporate employment</option>
-            <option value="Retirement savings">Retirement savings</option>
-            <option value="Business sale and dividends">Business sale and dividends</option>
-            <option value="Corporate cash reserves">Corporate cash reserves</option>
-            <option value="Family assets">Family assets</option>
-        </select>
+        <h3>4. Liquidity and Financial Context</h3>
 
-        <label for="fatca_crs">FATCA / CRS</label>
-        <select id="fatca_crs" name="fatca_crs">
-            <option value="">-- Select FATCA / CRS classification --</option>
-            <option value="CRS only">CRS only</option>
-            <option value="Corporate CRS">Corporate CRS</option>
-            <option value="FATCA reportable">FATCA reportable</option>
-            <option value="Not reportable">Not reportable</option>
-        </select>
+        <div class="form-grid">
+            <div>
+                <label for="net_worth">Net Worth</label>
+                <p class="muted">Client’s approximate total wealth across cash, property, investments, and other assets. This helps the portfolio manager judge whether the client can absorb losses.</p>
+                <input type="number" id="net_worth" name="net_worth" min="0" step="1000" placeholder="Example: 1400000">
+            </div>
 
-        <label for="pep">PEP Status</label>
-        <select id="pep" name="pep">
-            <option value="False">No</option>
-            <option value="True">Yes</option>
-            <option value="Low-risk PEP">Low-risk PEP</option>
-        </select>
+            <div>
+                <label for="investments">Existing Investments</label>
+                <p class="muted">Client’s existing investments outside this specific mandate. This helps avoid over-concentration if the client already has exposure elsewhere.</p>
+                <input type="number" id="investments" name="investments" min="0" step="1000" placeholder="Example: 600000">
+            </div>
 
-        <h3>4. Investment Objectives</h3>
+            <div>
+                <label for="liabilities">Liabilities</label>
+                <p class="muted">Client’s approximate debts, loans, mortgages, or financial obligations. Higher liabilities normally reduce the client’s capacity to take investment risk.</p>
+                <input type="number" id="liabilities" name="liabilities" min="0" step="1000" placeholder="Example: 200000">
+            </div>
 
-        <label for="goals">Investment Goal</label>
-        <select id="goals" name="goals" required>
-            <option value="">-- Select investment goal --</option>
-            <option value="Capital preservation and stable income">Capital preservation and stable income</option>
-            <option value="Long-term growth">Long-term growth</option>
-            <option value="Preserve capital and earn yield">Preserve capital and earn yield</option>
-            <option value="Growth and diversification">Growth and diversification</option>
-            <option value="Preserve wealth and achieve moderate growth">Preserve wealth and achieve moderate growth</option>
-        </select>
+            <div>
+                <label for="liquidity_needs">Liquidity Needs</label>
+                <p class="muted">Client’s need for cash access. Choose Low if the client can stay invested for longer; Medium if some cash may be needed; High or Monthly liquidity required if the portfolio must remain easy to sell or income/cash is needed regularly.</p>
+                <select id="liquidity_needs" name="liquidity_needs">
+                    <option value="">-- Select liquidity need --</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Monthly liquidity required">Monthly liquidity required</option>
+                </select>
+            </div>
+        </div>
 
-        <label for="time_horizon_years">Time Horizon</label>
-        <select id="time_horizon_years" name="time_horizon_years" required>
-            <option value="">-- Select time horizon --</option>
-            <option value="1-3">1-3 years</option>
-            <option value="5-7">5-7 years</option>
-            <option value="10+">10+ years</option>
-            <option value="15+">15+ years</option>
-            <option value="30+">30+ years</option>
-        </select>
+        <h3>5. Mandate Management</h3>
 
-        <label for="expected_return_percent">Expected Return (%)</label>
-        <select id="expected_return_percent" name="expected_return_percent" required>
-            <option value="">-- Select expected return --</option>
-            <option value="1-2">1-2%</option>
-            <option value="2-3">2-3%</option>
-            <option value="5-7">5-7%</option>
-            <option value="6-8">6-8%</option>
-            <option value="8-12">8-12%</option>
-        </select>
+        <div class="form-grid">
+            <div>
+                <label for="mandate_type">Mandate Type</label>
+                <p class="muted">Discretionary means the manager can decide. Advisory means the client approves decisions.</p>
+                <select id="mandate_type" name="mandate_type" required>
+                    <option value="">-- Select mandate type --</option>
+                    <option value="Discretionary">Discretionary</option>
+                    <option value="Advisory">Advisory</option>
+                </select>
+            </div>
 
-        <label for="benchmark">Benchmark Description</label>
-        <select id="benchmark" name="benchmark" required>
-            <option value="">-- Select benchmark description --</option>
-            <option value="Eurozone government bond index">Eurozone government bond index</option>
-            <option value="MSCI World">MSCI World</option>
-            <option value="CHF money-market index">CHF money-market index</option>
-            <option value="MSCI ACWI">MSCI ACWI</option>
-            <option value="40/60 global portfolio">40/60 global portfolio</option>
-        </select>
+            <div>
+                <label for="rebalancing_frequency">Rebalancing Frequency</label>
+                <p class="muted">How often the portfolio should be reviewed and adjusted.</p>
+                <select id="rebalancing_frequency" name="rebalancing_frequency">
+                    <option value="">-- Select rebalancing frequency --</option>
+                    <option value="Monthly liquidity checks">Monthly liquidity checks</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Semi-annual">Semi-annual</option>
+                    <option value="Opportunistic">Opportunistic</option>
+                </select>
+            </div>
 
-        <h3>5. Risk Profile</h3>
+            <div>
+                <label for="investment_style">Investment Style</label>
+                <p class="muted">How the portfolio should generally be managed.</p>
+                <select id="investment_style" name="investment_style">
+                    <option value="">-- Select investment style --</option>
+                    <option value="Income-focused">Income-focused</option>
+                    <option value="Passive">Passive</option>
+                    <option value="Capital protection">Capital protection</option>
+                    <option value="Thematic and opportunistic">Thematic and opportunistic</option>
+                    <option value="Diversified and institutional">Diversified and institutional</option>
+                </select>
+            </div>
 
-        <label for="risk_tolerance">Risk Tolerance</label>
-        <select id="risk_tolerance" name="risk_tolerance" required>
-            <option value="">-- Select risk tolerance --</option>
-            <option value="Very low">Very low</option>
-            <option value="Conservative">Conservative</option>
-            <option value="Balanced">Balanced</option>
-            <option value="Growth">Growth</option>
-            <option value="Aggressive">Aggressive</option>
-        </select>
-
-        <label for="risk_capacity">Risk Capacity</label>
-        <select id="risk_capacity" name="risk_capacity" required>
-            <option value="">-- Select risk capacity --</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Very high">Very high</option>
-        </select>
-
-        <label for="max_drawdown_percent">Maximum Drawdown (%)</label>
-        <select id="max_drawdown_percent" name="max_drawdown_percent" required>
-            <option value="">-- Select max drawdown --</option>
-            <option value="-3">-3%</option>
-            <option value="-8">-8%</option>
-            <option value="-15">-15%</option>
-            <option value="-20">-20%</option>
-            <option value="-30">-30%</option>
-        </select>
-
-        <h3>6. Financial Position and Liquidity</h3>
-
-        <label for="net_worth">Net Worth</label>
-        <input type="number" id="net_worth" name="net_worth" min="0" step="1000">
-
-        <label for="investments">Investments</label>
-        <input type="number" id="investments" name="investments" min="0" step="1000">
-
-        <label for="real_estate">Real Estate</label>
-        <select id="real_estate" name="real_estate">
-            <option value="">-- Select real estate position --</option>
-            <option value="None">None</option>
-            <option value="Primary residence">Primary residence</option>
-            <option value="Home and rental property">Home and rental property</option>
-            <option value="Three properties">Three properties</option>
-            <option value="Large real estate exposure">Large real estate exposure</option>
-        </select>
-
-        <label for="liabilities">Liabilities</label>
-        <input type="number" id="liabilities" name="liabilities" min="0" step="1000">
-
-        <label for="income">Income</label>
-        <input type="text" id="income" name="income" placeholder="example: 180000 yearly salary">
-
-        <label for="expenses">Expenses</label>
-        <input type="text" id="expenses" name="expenses" placeholder="example: 70000 yearly expenses">
-
-        <label for="liquidity_needs">Liquidity Needs</label>
-        <select id="liquidity_needs" name="liquidity_needs">
-            <option value="">-- Select liquidity need --</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Monthly liquidity required">Monthly liquidity required</option>
-        </select>
-
-        <h3>7. Mandate Constraints</h3>
-
-        <label for="legal">Legal / Product Restriction</label>
-        <select id="legal" name="legal">
-            <option value="">-- Select legal/product rule --</option>
-            <option value="UCITS">UCITS</option>
-            <option value="UCITS-compliant">UCITS-compliant</option>
-            <option value="Corporate policy prohibits equities">Corporate policy prohibits equities</option>
-            <option value="None">None</option>
-            <option value="Must include alternatives">Must include alternatives</option>
-        </select>
-
-        <label for="esg">ESG Rule</label>
-        <select id="esg" name="esg">
-            <option value="">-- Select ESG rule --</option>
-            <option value="Required">Required</option>
-            <option value="No tobacco">No tobacco</option>
-            <option value="Neutral">Neutral</option>
-            <option value="Prefers clean energy">Prefers clean energy</option>
-        </select>
-
-        <label for="currency">Currency Rule</label>
-        <select id="currency" name="currency">
-            <option value="">-- Select currency rule --</option>
-            <option value="EUR only">EUR only</option>
-            <option value="CHF only">CHF only</option>
-            <option value="EUR base, FX allowed">EUR base, FX allowed</option>
-            <option value="USD, EUR, CHF">USD, EUR, CHF</option>
-            <option value="GBP base, global exposure allowed">GBP base, global exposure allowed</option>
-        </select>
-
-        <h3>8. Preferences, Behaviour and Mandate</h3>
-
-        <label for="investment_style">Investment Style</label>
-        <select id="investment_style" name="investment_style">
-            <option value="">-- Select investment style --</option>
-            <option value="Income-focused">Income-focused</option>
-            <option value="Passive">Passive</option>
-            <option value="Capital protection">Capital protection</option>
-            <option value="Thematic and opportunistic">Thematic and opportunistic</option>
-            <option value="Diversified and institutional">Diversified and institutional</option>
-        </select>
-
-        <label for="products">Preferred Products</label>
-        <select id="products" name="products">
-            <option value="">-- Select product preference --</option>
-            <option value="ETFs only">ETFs only</option>
-            <option value="Bond funds, Money-market funds">Bond funds, Money-market funds</option>
-            <option value="Money-market funds, Short-duration bonds">Money-market funds, Short-duration bonds</option>
-            <option value="Direct equities, Thematic ETFs">Direct equities, Thematic ETFs</option>
-            <option value="Hedge funds, Private equity, Real estate, ETFs">Hedge funds, Private equity, Real estate, ETFs</option>
-        </select>
-
-        <label for="communication">Communication Style</label>
-        <select id="communication" name="communication">
-            <option value="">-- Select communication style --</option>
-            <option value="Monthly, simplified reports">Monthly, simplified reports</option>
-            <option value="Quarterly">Quarterly</option>
-            <option value="Monthly, detailed">Monthly, detailed</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Monthly plus quarterly deep-dive reports">Monthly plus quarterly deep-dive reports</option>
-        </select>
-
-        <label for="past_reactions">Past Market Reaction</label>
-        <select id="past_reactions" name="past_reactions">
-            <option value="">-- Select past reaction --</option>
-            <option value="Panicked during 2020 market crash">Panicked during 2020 market crash</option>
-            <option value="Stayed invested during downturns">Stayed invested during downturns</option>
-            <option value="Extremely risk-averse">Extremely risk-averse</option>
-            <option value="Buys aggressively during market dips">Buys aggressively during market dips</option>
-            <option value="Calm during crises">Calm during crises</option>
-        </select>
-
-        <label for="decision_style">Decision Style</label>
-        <select id="decision_style" name="decision_style">
-            <option value="">-- Select decision style --</option>
-            <option value="Hands-off">Hands-off</option>
-            <option value="Very involved">Very involved</option>
-            <option value="Collaborative">Collaborative</option>
-            <option value="Committee-based">Committee-based</option>
-        </select>
-
-        <label for="biases">Behavioural Biases</label>
-        <select id="biases" name="biases">
-            <option value="">-- Select behavioural bias --</option>
-            <option value="Loss aversion">Loss aversion</option>
-            <option value="Home bias toward domestic equities">Home bias toward domestic equities</option>
-            <option value="Cash bias">Cash bias</option>
-            <option value="Overconfidence">Overconfidence</option>
-            <option value="None significant">None significant</option>
-        </select>
-
-        <label for="mandate_type">Mandate Type</label>
-        <select id="mandate_type" name="mandate_type" required>
-            <option value="">-- Select mandate type --</option>
-            <option value="Discretionary">Discretionary</option>
-            <option value="Advisory">Advisory</option>
-        </select>
-
-        <label for="fees_percent">Fees (%)</label>
-        <select id="fees_percent" name="fees_percent">
-            <option value="">-- Select fee --</option>
-            <option value="0.4">0.4%</option>
-            <option value="0.6">0.6%</option>
-            <option value="0.8">0.8%</option>
-            <option value="1.0">1.0%</option>
-            <option value="1.2">1.2%</option>
-        </select>
-
-        <label for="rebalancing_frequency">Rebalancing Frequency</label>
-        <select id="rebalancing_frequency" name="rebalancing_frequency">
-            <option value="">-- Select rebalancing frequency --</option>
-            <option value="Monthly liquidity checks">Monthly liquidity checks</option>
-            <option value="Quarterly">Quarterly</option>
-            <option value="Semi-annual">Semi-annual</option>
-            <option value="Opportunistic">Opportunistic</option>
-        </select>
+            <div>
+                <label for="past_reactions">Past Market Behaviour</label>
+                <p class="muted">Helps assess whether the portfolio could cause stress in downturns.</p>
+                <select id="past_reactions" name="past_reactions">
+                    <option value="">-- Select past reaction --</option>
+                    <option value="Panicked during 2020 market crash">Panicked during 2020 market crash</option>
+                    <option value="Stayed invested during downturns">Stayed invested during downturns</option>
+                    <option value="Extremely risk-averse">Extremely risk-averse</option>
+                    <option value="Buys aggressively during market dips">Buys aggressively during market dips</option>
+                    <option value="Calm during crises">Calm during crises</option>
+                </select>
+            </div>
+        </div>
 
         <label for="ips">Investment Policy Statement Summary</label>
+        <p class="muted">Write one short sentence describing the mandate objective and key restrictions.</p>
         <textarea
             id="ips"
             name="ips"
             rows="4"
-            placeholder="Write a short IPS summary for this portfolio"
+            placeholder="Example: Global equity exposure with ESG screening and quarterly review."
         ></textarea>
 
         <button type="submit">Save Portfolio Profile</button>
     </form>
 </div>
-
-<!-- ====================================================== -->
-<!-- EXISTING PORTFOLIO RECORDS                             -->
-<!-- ====================================================== -->
 
 <div class="card">
     <h2>Saved Portfolio Profiles</h2>
