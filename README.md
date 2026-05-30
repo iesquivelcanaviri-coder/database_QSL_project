@@ -576,4 +576,5 @@ If the hosted PostgreSQL database was created before the final timestamp update,
 database_migration_distinction_update.sql
 ```
 
+
 inside the Neon SQL Editor before redeploying the final version.
