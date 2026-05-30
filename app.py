@@ -77,6 +77,8 @@ class Portfolio(db.Model):  # defining the Portfolio table as a Python class usi
     portfolio_value = db.Column(db.Float, nullable=False, default=0.0)  # total value of the portfolio (default 0)
     max_weight = db.Column(db.Float, nullable=False, default=10.0)  # max % weight allowed per stock
     profile_data = db.Column(db.JSON, nullable=False)  # storing the portfolio mandate as JSON (risk, objectives, etc.)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # timestamp for when the portfolio profile was created
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # timestamp for when the portfolio profile was last edited
 
     holdings = db.relationship(
         "PortfolioHolding",  # linking to the PortfolioHolding table
@@ -114,6 +116,7 @@ class PortfolioHolding(db.Model):  # model representing each stock saved inside 
     volatility_1y = db.Column(db.Float, nullable=True)  # predicted 1-year volatility
     sharpe_like_1y = db.Column(db.Float, nullable=True)  # simplified Sharpe-like ratio for risk-adjusted performance
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # timestamp for when this holding was added
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # timestamp for when this holding was last updated
 
     __table_args__ = (
         UniqueConstraint("portfolio_id", "ticker", name="unique_portfolio_ticker"),  # prevents adding the same ticker twice to the same portfolio
@@ -156,6 +159,7 @@ class AnalysisRecord(db.Model):  # model that stores each completed analysis res
     sharpe_like_1y = db.Column(db.Float, nullable=True)  # simplified Sharpe-like ratio for risk-adjusted performance
     raw_result = db.Column(db.JSON, nullable=True)  # full raw analysis output stored as JSON (useful for debugging or UI)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # timestamp for when this analysis record was created
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # timestamp for when this analysis record was last updated
 
 
 # ------------------------------------------------------------
@@ -169,6 +173,7 @@ class ContactMessage(db.Model):  # model for storing messages sent through the c
     email = db.Column(db.String(160), nullable=False)  # their email address so we know who contacted us
     message = db.Column(db.Text, nullable=False)  # the actual message text they typed in the form
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # timestamp for when the message was submitted
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # timestamp for when the message was last updated
 
 
 # ============================================================
@@ -1430,6 +1435,61 @@ def portfolio_profiles():  # This route handles the entire workflow for creating
         next_client_key=f"client_{next_client_number}",  # Pre-fill the next available client key.
     )
 
+
+        # ------------------------------------------------------------
+        # UPDATE PORTFOLIO PROFILE ROUTE
+        # ------------------------------------------------------------
+@app.route("/portfolio_profiles/<int:portfolio_id>/update", methods=["POST"])
+def update_portfolio_profile(portfolio_id):
+    """Update an existing portfolio profile.
+
+    This route demonstrates the UPDATE part of CRUD for the Portfolio table.
+    It reuses the same simplified questionnaire fields as the Create form.
+    """
+    portfolio = Portfolio.query.get_or_404(portfolio_id)
+
+    display_name = clean_form_value("display_name", "").strip()
+    benchmark_ticker = clean_form_value("benchmark_ticker", portfolio.benchmark_ticker).upper()
+    portfolio_value = clean_float("portfolio_value", portfolio.portfolio_value)
+    max_weight = clean_float("max_weight", portfolio.max_weight)
+
+    if not display_name:
+        flash("Portfolio name is required before updating.", "error")
+        return redirect(url_for("portfolio_profiles"))
+
+    portfolio.display_name = display_name
+    portfolio.benchmark_ticker = benchmark_ticker
+    portfolio.portfolio_value = portfolio_value
+    portfolio.max_weight = max_weight
+    portfolio.profile_data = build_profile_data_from_form()
+    portfolio.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash(f"Portfolio profile {portfolio.client_id} was updated successfully.", "success")
+    return redirect(url_for("portfolio_profiles"))
+
+
+        # ------------------------------------------------------------
+        # DELETE PORTFOLIO PROFILE ROUTE
+        # ------------------------------------------------------------
+@app.route("/portfolio_profiles/<int:portfolio_id>/delete", methods=["POST"])
+def delete_portfolio_profile(portfolio_id):
+    """Delete an existing portfolio profile and its related holdings.
+
+    This route demonstrates DELETE for the Portfolio table. The SQLAlchemy
+    relationship cascade also removes linked holdings and analysis records.
+    """
+    portfolio = Portfolio.query.get_or_404(portfolio_id)
+    portfolio_name = portfolio.display_name
+
+    db.session.delete(portfolio)
+    db.session.commit()
+
+    flash(f"Portfolio profile '{portfolio_name}' and its related records were deleted.", "success")
+    return redirect(url_for("portfolio_profiles"))
+
+
         # ------------------------------------------------------------
         # MARKET DASHBOARD ROUTE
         # ------------------------------------------------------------
@@ -1524,63 +1584,67 @@ def analyze():  # It performs a full stock analysis and returns the results as J
         # ------------------------------------------------------------
 @app.route("/add-to-portfolio", methods=["POST"])  # This endpoint is called when the user clicks “Add to Portfolio”.
 def add_to_portfolio():  # It validates the holding, applies constraints, and saves it.
-    data = request.get_json(force=True)  # Parse JSON body from the request.
+    """Analyse a selected ticker and save or update it as a portfolio holding.
 
-    ticker = data.get("ticker", "").strip().upper()  # Clean ticker.
-    portfolio_key = data.get("portfolio_key", "").strip()  # Identify portfolio.
-    portfolio = get_portfolio_by_key(portfolio_key)  # Fetch portfolio object.
+    This endpoint demonstrates CREATE and UPDATE for the PortfolioHolding table.
+    The same ticker in the same portfolio is updated instead of duplicated because
+    of the unique database constraint on portfolio_id + ticker.
+    """
+    try:
+        data = request.get_json(force=True)  # Parse JSON body from the request.
 
-    if not ticker or not portfolio:  # Basic validation.
-        return jsonify({"error": "Invalid stock or portfolio."}), 400
+        ticker = data.get("ticker", "").strip().upper()  # Clean ticker.
+        portfolio_key = data.get("portfolio_key", "").strip()  # Identify portfolio.
+        portfolio = get_portfolio_by_key(portfolio_key)  # Fetch portfolio object.
 
-    # --- RUN ANALYSIS AGAIN ---
-    # We re-run the analysis to ensure the weight/decision is up to date.
-    analysis = analyze_stock(ticker, portfolio.benchmark_ticker, portfolio.key)
+        if not ticker or not portfolio:  # Basic validation.
+            return jsonify({"error": "Invalid stock or portfolio."}), 400
 
-    # --- VALIDATE AGAINST PORTFOLIO RULES ---
-    validation = validate_portfolio_addition(
-        portfolio=portfolio,
-        ticker=ticker,
-        recommended_weight=analysis["recommended_weight"],
-        sector=analysis["sector"],
-        industry=analysis["industry"],
-    )
+        analysis = analyze_stock(ticker, portfolio.benchmark_ticker, portfolio.key)
 
-    if validation["errors"]:  # If the holding violates constraints, we stop here.
-        return jsonify({"error": validation["errors"], "warnings": validation["warnings"]}), 400
+        validation = validate_portfolio_addition(
+            portfolio=portfolio,
+            ticker=ticker,
+            recommended_weight=analysis["recommended_weight"],
+            sector=analysis["sector"],
+            industry=analysis["industry"],
+        )
 
-    # --- CHECK IF HOLDING ALREADY EXISTS ---
-    holding = PortfolioHolding.query.filter_by(portfolio_id=portfolio.id, ticker=ticker).first()
-    if not holding:
-        # If the holding doesn’t exist, create a new one.
-        holding = PortfolioHolding(portfolio_id=portfolio.id, ticker=ticker)
-        db.session.add(holding)
-        message = f"{ticker} added to {portfolio.display_name}."
-    else:
-        # If it exists, we update it instead.
-        message = f"{ticker} updated in {portfolio.display_name}."
+        if validation["errors"]:
+            return jsonify({"error": validation["errors"], "warnings": validation["warnings"]}), 400
 
-    # --- UPDATE HOLDING FIELDS ---
-    # These fields come directly from the analysis engine.
-    holding.recommended_weight = analysis["recommended_weight"]
-    holding.weight_decimal = validation["weight_decimal"]
-    holding.decision = analysis["decision"]
-    holding.tag = analysis["tag"]
-    holding.sector = analysis["sector"]
-    holding.industry = analysis["industry"]
-    holding.beta = analysis["beta"]
-    holding.score = analysis["score"]
-    holding.expected_return_1y = analysis["one_year"]["annualised_expected_return"]
-    holding.volatility_1y = analysis["one_year"]["annualised_volatility"]
-    holding.sharpe_like_1y = analysis["one_year"]["sharpe_like"]
+        holding = PortfolioHolding.query.filter_by(portfolio_id=portfolio.id, ticker=ticker).first()
+        if not holding:
+            holding = PortfolioHolding(portfolio_id=portfolio.id, ticker=ticker)
+            db.session.add(holding)
+            message = f"{ticker} added to {portfolio.display_name}."
+        else:
+            message = f"{ticker} updated in {portfolio.display_name}."
 
-    db.session.commit()  # Save changes to the database.
+        holding.recommended_weight = analysis["recommended_weight"]
+        holding.weight_decimal = validation["weight_decimal"]
+        holding.decision = analysis["decision"]
+        holding.tag = analysis["tag"]
+        holding.sector = analysis["sector"]
+        holding.industry = analysis["industry"]
+        holding.beta = analysis["beta"]
+        holding.score = analysis["score"]
+        holding.expected_return_1y = analysis["one_year"]["annualised_expected_return"]
+        holding.volatility_1y = analysis["one_year"]["annualised_volatility"]
+        holding.sharpe_like_1y = analysis["one_year"]["sharpe_like"]
+        holding.updated_at = datetime.utcnow()
 
-    return jsonify({
-        "message": message,  # Friendly confirmation message.
-        "warnings": validation["warnings"],  # Any soft warnings (e.g., currency mismatch).
-        "portfolio": build_grouped_portfolio_payload(),  # Updated portfolio data for the frontend.
-    })
+        db.session.commit()
+
+        return jsonify({
+            "message": message,
+            "warnings": validation["warnings"],
+            "portfolio": build_grouped_portfolio_payload(),
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Could not save holding: {str(e)}"}), 500
 
         # ------------------------------------------------------------
         # GET ALL PORTFOLIO STOCKS (USED BY JAVASCRIPT)

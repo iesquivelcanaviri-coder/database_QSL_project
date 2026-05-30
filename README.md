@@ -401,6 +401,7 @@ The following functionality was tested successfully:
 
 ---
 
+
 # Best Practices Applied
 
 The project demonstrates multiple software engineering best practices including:
@@ -451,3 +452,128 @@ Include screenshots of:
 This application was developed for educational and academic purposes.
 
 The portfolio analysis calculations and investment outputs are simplified educational models and should not be interpreted as professional financial advice.
+
+---
+
+# Distinction-Level Evidence Map
+
+This section explains how the project meets the assignment rubric.
+
+## Database Schema and CRUD Logic
+
+The application defines four SQLAlchemy ORM models:
+
+* `Portfolio`
+* `PortfolioHolding`
+* `AnalysisRecord`
+* `ContactMessage`
+
+The schema demonstrates relational database design through:
+
+* primary keys
+* foreign keys
+* one-to-many relationships
+* cascade deletion
+* JSON profile storage
+* unique database constraints
+* timestamp fields for created and updated records
+
+CRUD evidence:
+
+| CRUD Area | Evidence |
+| --------- | -------- |
+| Create | new portfolio profiles, new holdings, analysis records, contact messages |
+| Read | saved profiles, dashboard rows, holdings, contact messages |
+| Update | edit saved portfolio profiles and update existing holdings |
+| Delete | delete holdings and delete portfolio profiles with linked records |
+
+## Flask and PostgreSQL Integration
+
+The project uses Flask-SQLAlchemy to connect Flask to PostgreSQL through the `DATABASE_URL` environment variable.
+
+The app is deployment-ready because it:
+
+* supports Neon PostgreSQL
+* supports Render environment variables
+* uses Gunicorn in production
+* keeps database credentials outside source code
+* provides a local development fallback database
+
+## Frontend Design and JavaScript
+
+The frontend includes:
+
+* reusable Jinja base template
+* reusable navbar
+* responsive card layout
+* form grids
+* dashboard filters
+* sortable market tables
+* accordion sections
+* JavaScript fetch API requests
+* dynamic portfolio holdings rendering
+* delete actions without full page rebuild
+
+## Deployment Evidence
+
+Live deployed application:
+
+https://database-qsl-project.onrender.com
+
+Deployment stack:
+
+* GitHub repository
+* Render web service
+* Neon PostgreSQL cloud database
+* Gunicorn production server
+
+## Testing Evidence
+
+Before submission, test these flows on both local Flask and Render:
+
+* create a new portfolio profile
+* edit an existing portfolio profile
+* assign a stock or ETF to a profile
+* update an existing holding by saving the same ticker again
+* delete a holding
+* delete a test portfolio profile
+* submit a contact form message
+* refresh the browser and confirm records persist
+* confirm the Render URL shows the newest GitHub version
+
+---
+
+# Deployment Notes for Marker
+
+## Render Build Command
+
+```bash
+pip install -r requirements.txt
+```
+
+## Render Start Command
+
+```bash
+gunicorn app:app
+```
+
+## Required Render Environment Variables
+
+```text
+SECRET_KEY=<secure secret key>
+DATABASE_URL=<Neon PostgreSQL connection string>
+```
+
+The real `.env` file is intentionally not submitted because it contains private credentials.
+
+---
+
+# Database Migration Note
+
+If the hosted PostgreSQL database was created before the final timestamp update, run:
+
+```text
+database_migration_distinction_update.sql
+```
+
+inside the Neon SQL Editor before redeploying the final version.

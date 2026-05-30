@@ -508,6 +508,159 @@ Portfolio Profiles | PostgreSQL Portfolio App
                 {% endfor %}
             </ul>
         </div>
+        <button class="accordion" type="button">Edit This Portfolio Profile</button>
+        <div class="panel">
+            <p class="muted">
+                This section demonstrates the <strong>Update</strong> part of CRUD for the Portfolio table.
+                Change the key portfolio manager fields below and save the edited profile.
+            </p>
+
+            <form method="post" action="{{ url_for('update_portfolio_profile', portfolio_id=portfolio.id) }}">
+                <div class="form-grid">
+                    <div>
+                        <label>Portfolio / Client Display Name</label>
+                        <input type="text" name="display_name" value="{{ portfolio.display_name }}" required>
+                    </div>
+
+                    <div>
+                        <label>Client / Entity Name</label>
+                        <input type="text" name="client_name" value="{{ identity.name or identity.company_name or portfolio.display_name }}" required>
+                    </div>
+
+                    <div>
+                        <label>Client Type</label>
+                        <select name="client_type" required>
+                            {% set current_type = identity.client_type or identity.entity_type or "Individual" %}
+                            {% for option in ["Individual", "Corporate", "Family Office", "Trust"] %}
+                                <option value="{{ option }}" {% if current_type == option %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Portfolio Value</label>
+                        <input type="number" name="portfolio_value" min="0" step="1000" value="{{ portfolio.portfolio_value }}" required>
+                    </div>
+
+                    <div>
+                        <label>Investment Goal</label>
+                        <input type="text" name="goals" value="{{ objectives.goals or '' }}" required>
+                    </div>
+
+                    <div>
+                        <label>Time Horizon</label>
+                        <input type="text" name="time_horizon_years" value="{{ objectives.time_horizon_years or '' }}" required>
+                    </div>
+
+                    <div>
+                        <label>Risk Tolerance</label>
+                        <input type="text" name="risk_tolerance" value="{{ risk_profile.risk_tolerance or '' }}" required>
+                    </div>
+
+                    <div>
+                        <label>Risk Capacity</label>
+                        <input type="text" name="risk_capacity" value="{{ risk_profile.risk_capacity or '' }}" required>
+                    </div>
+
+                    <div>
+                        <label>Maximum Drawdown (%)</label>
+                        <input type="number" name="max_drawdown_percent" value="{{ risk_profile.max_drawdown_percent or -15 }}" required>
+                    </div>
+
+                    <div>
+                        <label>Expected Return (%)</label>
+                        <input type="text" name="expected_return_percent" value="{{ objectives.expected_return_percent or '' }}" required>
+                    </div>
+
+                    <div>
+                        <label>Benchmark / Reference Ticker</label>
+                        <input type="text" name="benchmark_ticker" value="{{ portfolio.benchmark_ticker }}" required>
+                    </div>
+
+                    <div>
+                        <label>Benchmark Description</label>
+                        <input type="text" name="benchmark" value="{{ objectives.benchmark or portfolio.benchmark_ticker }}" required>
+                    </div>
+
+                    <div>
+                        <label>Maximum Position Weight (%)</label>
+                        <input type="number" name="max_weight" min="0" step="1" value="{{ portfolio.max_weight }}" required>
+                    </div>
+
+                    <div>
+                        <label>Currency Rule</label>
+                        <input type="text" name="currency" value="{{ constraints.currency or '' }}">
+                    </div>
+
+                    <div>
+                        <label>Product Restriction</label>
+                        <input type="text" name="legal" value="{{ constraints.legal or '' }}">
+                    </div>
+
+                    <div>
+                        <label>ESG Rule</label>
+                        <input type="text" name="esg" value="{{ constraints.esg or '' }}">
+                    </div>
+
+                    <div>
+                        <label>Net Worth</label>
+                        <input type="number" name="net_worth" min="0" step="1000" value="{{ financials.net_worth or 0 }}">
+                    </div>
+
+                    <div>
+                        <label>Existing Investments</label>
+                        <input type="number" name="investments" min="0" step="1000" value="{{ financials.investments or 0 }}">
+                    </div>
+
+                    <div>
+                        <label>Liabilities</label>
+                        <input type="number" name="liabilities" min="0" step="1000" value="{{ financials.liabilities or 0 }}">
+                    </div>
+
+                    <div>
+                        <label>Liquidity Needs</label>
+                        <input type="text" name="liquidity_needs" value="{{ financials.liquidity_needs or '' }}">
+                    </div>
+
+                    <div>
+                        <label>Mandate Type</label>
+                        <input type="text" name="mandate_type" value="{{ mandate.type or 'Advisory' }}">
+                    </div>
+
+                    <div>
+                        <label>Rebalancing Frequency</label>
+                        <input type="text" name="rebalancing_frequency" value="{{ mandate.rebalancing_frequency or '' }}">
+                    </div>
+
+                    <div>
+                        <label>Investment Style</label>
+                        <input type="text" name="investment_style" value="{{ preferences.investment_style or '' }}">
+                    </div>
+
+                    <div>
+                        <label>Past Market Behaviour</label>
+                        <input type="text" name="past_reactions" value="{{ behavioural.past_reactions or '' }}">
+                    </div>
+                </div>
+
+                <label>Investment Policy Statement Summary</label>
+                <textarea name="ips" rows="3">{{ mandate.ips or '' }}</textarea>
+
+                <button type="submit">Update Portfolio Profile</button>
+            </form>
+        </div>
+
+        <button class="accordion" type="button">Delete This Portfolio Profile</button>
+        <div class="panel">
+            <p class="muted">
+                This demonstrates the <strong>Delete</strong> part of CRUD for the Portfolio table.
+                Deleting a portfolio also deletes its linked holdings and analysis records through SQLAlchemy cascade rules.
+            </p>
+
+            <form method="post" action="{{ url_for('delete_portfolio_profile', portfolio_id=portfolio.id) }}" onsubmit="return confirm('Delete this portfolio profile and all linked holdings?');">
+                <button type="submit" class="delete-holding-btn">Delete Portfolio Profile</button>
+            </form>
+        </div>
     </div>
 
 {% else %}
