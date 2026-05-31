@@ -1,15 +1,8 @@
 # Portfolio Management Decision-Support Web Application with PostgreSQL
 
----
+## Student Details
 
-# Student Details
-
-| Field               | Information                                          |
-| ------------------- | ---------------------------------------------------- |
-| Student Name        | Irene Esquivel Canaviri                              |
-| Module              | Databases                                            |
-| Assignment          | Building a Web Application with Flask and a Database |
-
+**Student Name:** Irene Esquivel Canaviri
 
 ---
 
@@ -19,15 +12,26 @@
 
 ---
 
+
 # Live Deployment
 
 ## Public Render Deployment URL
 
-```text
 https://database-qsl-project.onrender.com
-```
 
 The application is fully deployed using Render and connected to a Neon PostgreSQL cloud database.
+
+---
+
+# GitHub Repository
+
+## Public GitHub Repository URL
+
+```text
+https://github.com/iesquivelcanaviri-coder/database_QSL_project.git
+```
+
+This repository contains the Flask application source code, Jinja templates, static CSS and JavaScript assets, deployment files, and README documentation for the database web application assignment.
 
 ---
 
@@ -46,39 +50,27 @@ The application simulates a professional portfolio management workflow where por
 * store client contact messages
 * persist all records inside a PostgreSQL database
 
-The project demonstrates full-stack web-development concepts including:
+The project demonstrates full-stack web development concepts including backend Flask development, PostgreSQL database integration, CRUD operations, frontend JavaScript interactivity, responsive CSS design, and cloud deployment.
 
-* backend Flask development
-* PostgreSQL database integration
-* CRUD operations
-* responsive frontend design
-* JavaScript interactivity
-* REST-style API routes
-* cloud deployment using Render
-* Neon PostgreSQL cloud database hosting
-
-The application was designed to simulate a simplified institutional portfolio-management environment while demonstrating modern database and software-engineering best practices.
+The application was designed to simulate a simplified institutional portfolio-management environment while demonstrating modern database and web-development best practices.
 
 ---
 
 # Main Features
 
-## Core Application Features
-
 * Flask backend routing
 * PostgreSQL database persistence
 * SQLAlchemy ORM integration
 * Full CRUD operations
-* Portfolio profile management
+* Responsive HTML5/CSS3 frontend
+* JavaScript dashboard interactivity
+* Portfolio profile creation
 * Portfolio holding management
 * Market dashboard analytics
 * Financial metric calculations
 * REST-style API endpoints
-* Contact message persistence
-* Dynamic dashboard filtering
-* Live portfolio updates
-* Responsive dashboard layouts
-* Cloud deployment using Render
+* Render cloud deployment
+* Neon PostgreSQL cloud database integration
 
 ---
 
@@ -103,87 +95,7 @@ The application was designed to simulate a simplified institutional portfolio-ma
 
 # Database Schema
 
-The application uses a relational PostgreSQL database connected through Flask-SQLAlchemy ORM.
-
-The schema demonstrates:
-
-* relational database design
-* primary keys
-* foreign keys
-* one-to-many relationships
-* unique constraints
-* timestamp tracking
-* JSON profile storage
-* cascade deletion
-
----
-
-# Entity Relationship Diagram (ERD)
-
-```mermaid
-erDiagram
-
-    Portfolio ||--o{ PortfolioHolding : contains
-    Portfolio ||--o{ AnalysisRecord : stores
-
-    Portfolio {
-        int id PK
-        string key
-        string client_id
-        string display_name
-        string benchmark_ticker
-        float portfolio_value
-        float max_weight
-        json profile_data
-        datetime created_at
-        datetime updated_at
-    }
-
-    PortfolioHolding {
-        int id PK
-        int portfolio_id FK
-        string ticker
-        string recommended_weight
-        float weight_decimal
-        string decision
-        string tag
-        string sector
-        string industry
-        float beta
-        int score
-        datetime created_at
-        datetime updated_at
-    }
-
-    AnalysisRecord {
-        int id PK
-        int portfolio_id FK
-        string ticker
-        float beta
-        int score
-        string decision
-        float expected_return_1y
-        float volatility_1y
-        float sharpe_like_1y
-        json raw_result
-        datetime created_at
-        datetime updated_at
-    }
-
-    ContactMessage {
-        int id PK
-        string name
-        string email
-        text message
-        datetime created_at
-    }
-```
-
----
-
-# Database Models
-
-## Portfolio Model
+## Portfolio
 
 The `Portfolio` model stores client portfolio mandates and investment profiles.
 
@@ -205,9 +117,9 @@ The `Portfolio` model stores client portfolio mandates and investment profiles.
 
 ---
 
-## PortfolioHolding Model
+## PortfolioHolding
 
-The `PortfolioHolding` model stores securities assigned to portfolios.
+The `PortfolioHolding` model stores securities saved inside portfolios.
 
 ### Key Fields
 
@@ -230,9 +142,9 @@ This ensures holdings are updated instead of duplicated.
 
 ---
 
-## AnalysisRecord Model
+## AnalysisRecord
 
-The `AnalysisRecord` model stores completed market-analysis outputs.
+The `AnalysisRecord` model stores completed analysis outputs.
 
 ### Key Fields
 
@@ -246,9 +158,9 @@ The `AnalysisRecord` model stores completed market-analysis outputs.
 
 ---
 
-## ContactMessage Model
+## ContactMessage
 
-The `ContactMessage` model stores contact-form submissions.
+The `ContactMessage` model stores contact form submissions.
 
 ### Key Fields
 
@@ -263,12 +175,12 @@ The `ContactMessage` model stores contact-form submissions.
 
 The project demonstrates complete database CRUD functionality.
 
-| CRUD Operation | Example                                                 |
-| -------------- | ------------------------------------------------------- |
-| Create         | save portfolio profiles, holdings, and contact messages |
-| Read           | retrieve portfolios, holdings, and dashboard data       |
-| Update         | update existing holdings and portfolio records          |
-| Delete         | remove saved holdings from portfolios                   |
+| CRUD Operation | Example                            |
+| -------------- | ---------------------------------- |
+| Create         | Save holdings and contact messages |
+| Read           | Retrieve portfolios and holdings   |
+| Update         | Update existing portfolio holdings |
+| Delete         | Remove saved holdings              |
 
 ---
 
@@ -288,55 +200,51 @@ The project demonstrates complete database CRUD functionality.
 
 | Route                         | Function                        |
 | ----------------------------- | ------------------------------- |
-| `POST /analyze`               | analyse a selected ticker       |
-| `POST /add-to-portfolio`      | add or update portfolio holding |
-| `GET /portfolio-stocks`       | retrieve portfolio holdings     |
-| `DELETE /delete-holding/<id>` | delete holding                  |
+| `POST /analyze`               | Analyse a selected ticker       |
+| `POST /add-to-portfolio`      | Add or update portfolio holding |
+| `GET /portfolio-stocks`       | Retrieve portfolio holdings     |
+| `DELETE /delete-holding/<id>` | Delete holding                  |
 
 ---
 
 # Frontend Design
 
-## HTML and Jinja Templates
+## HTML
 
-The project uses Jinja templating with reusable template inheritance.
+The project uses Jinja templating with reusable templates and inheritance.
 
-Features include:
+The application includes:
 
-* reusable base template
+* base template inheritance
 * reusable navigation bar
 * reusable dashboard layouts
 * responsive page structure
-* modular page components
 
 ---
 
-## CSS Styling
+## CSS
 
-Main stylesheet:
+The application uses a dedicated stylesheet:
 
 ```text
 static/css/style.css
 ```
 
-The CSS implementation includes:
+The CSS includes:
 
 * responsive layouts
-* dashboard cards
+* portfolio dashboard cards
 * accordions
-* responsive tables
-* form layouts
+* data tables
+* forms
 * responsive navigation
 * mobile-friendly design
-* hover states
-* transitions
-* financial dashboard styling
 
 ---
 
-## JavaScript Functionality
+## JavaScript
 
-Main JavaScript file:
+JavaScript functionality is implemented inside:
 
 ```text
 static/js/script.js
@@ -346,12 +254,10 @@ Features include:
 
 * asynchronous fetch API requests
 * live dashboard filtering
-* sortable market tables
+* table sorting
 * accordion interactions
 * dynamic portfolio updates
-* CRUD operations without full page refresh
-* delete handling
-* interactive dashboard controls
+* CRUD interaction without page refresh
 
 ---
 
@@ -375,55 +281,22 @@ The application supports:
 
 ---
 
-# Automated Testing
-
-The project includes automated route testing using Flask test clients.
-
-Test file:
-
-```text
-test_app.py
-```
-
-Implemented tests include:
-
-* home page route testing
-* contact page route testing
-* portfolio page route testing
-* HTTP status-code validation
-
-Example execution:
-
-```bash
-pytest
-```
-
----
-
 # Project Structure
 
 ```text
 portfolio-database-project/
 ├── app.py
-├── test_app.py
 ├── Procfile
 ├── requirements.txt
 ├── runtime.txt
 ├── README.md
 ├── .env.example
 ├── .gitignore
-├── screenshots/
 ├── static/
 │   ├── css/
 │   │   └── style.css
-│   ├── js/
-│   │   └── script.js
-│   └── images/
-│       ├── home.png
-│       ├── portfolio_profiles.png
-│       ├── market_dashboard.png
-│       ├── portfolio_performance.png
-│       └── contact.png
+│   └── js/
+│       └── script.js
 ├── templates/
 │   ├── base.html
 │   ├── _navbar.html
@@ -431,8 +304,7 @@ portfolio-database-project/
 │   ├── contact.html
 │   ├── market_dashboard.html
 │   ├── portfolio_profiles.html
-│   ├── portfolio_performance.html
-│   └── 404.html
+│   └── portfolio_performance.html
 └── instance/
 ```
 
@@ -490,21 +362,20 @@ python app.py
 
 The project is deployed using:
 
-* Render web hosting
-* Neon PostgreSQL cloud database
-* Gunicorn production WSGI server
+* Render (web hosting)
+* Neon PostgreSQL (cloud database)
 
 ---
 
-## Render Build Command
+## Render Configuration
+
+### Build Command
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## Render Start Command
+### Start Command
 
 ```bash
 gunicorn app:app
@@ -512,14 +383,14 @@ gunicorn app:app
 
 ---
 
-## Required Environment Variables
+## Environment Variables
+
+The following environment variables were configured inside Render:
 
 ```text
-SECRET_KEY=<secure-secret-key>
-DATABASE_URL=<neon-postgresql-connection-string>
+SECRET_KEY=<secret_key>
+DATABASE_URL=<neon_postgresql_connection_string>
 ```
-
-The real environment variables are intentionally excluded from GitHub for security purposes.
 
 ---
 
@@ -531,7 +402,7 @@ The following functionality was tested successfully:
 * portfolio profiles load from PostgreSQL
 * new portfolios can be created
 * holdings can be added to portfolios
-* holdings persist after refresh
+* holdings remain after refresh
 * holdings can be updated
 * holdings can be deleted
 * dashboard filtering works
@@ -542,9 +413,49 @@ The following functionality was tested successfully:
 
 ---
 
+
+# Application Architecture
+
+The application follows a full-stack Flask architecture:
+
+```text
+Browser / User Interface
+        ↓
+HTML + CSS + JavaScript
+        ↓
+Flask Routes and REST-style API Endpoints
+        ↓
+SQLAlchemy ORM Models
+        ↓
+Neon PostgreSQL Cloud Database
+        ↓
+Rendered HTML Templates / JSON Responses
+```
+
+The frontend uses Jinja templates for page rendering and JavaScript `fetch()` requests for dynamic database-backed actions such as adding and deleting portfolio holdings. The backend uses Flask routes to process requests, SQLAlchemy models to interact with PostgreSQL, and JSON responses to update the interface without requiring a full page reload.
+
+---
+
+# Validation and Error Handling
+
+The application includes validation and defensive programming to make the database workflow more reliable.
+
+Examples include:
+
+* required form fields for portfolio and contact creation
+* safe numeric conversion for portfolio values and weights
+* prevention of duplicate holdings through a unique portfolio-and-ticker constraint
+* backend validation before adding a holding to a portfolio
+* portfolio mandate checks, such as maximum position weight and restricted equity exposure
+* fallback market metrics if Yahoo Finance data is unavailable
+* JSON error responses for failed API requests
+* user-facing success and error messages through Flask flash messages and JavaScript feedback blocks
+
+---
+
 # Best Practices Applied
 
-The project demonstrates multiple software-engineering best practices including:
+The project demonstrates multiple software engineering best practices including:
 
 * relational database design
 * SQLAlchemy ORM usage
@@ -552,7 +463,7 @@ The project demonstrates multiple software-engineering best practices including:
 * REST-style API design
 * responsive frontend design
 * reusable Jinja templates
-* environment-variable configuration
+* environment variable configuration
 * deployment-ready architecture
 * database normalization concepts
 * CRUD separation
@@ -563,7 +474,7 @@ The project demonstrates multiple software-engineering best practices including:
 
 # Security and Configuration
 
-The application uses environment variables to protect sensitive configuration data.
+The project uses environment variables to protect sensitive configuration data.
 
 The `.env` file is excluded from GitHub using `.gitignore`.
 
@@ -573,41 +484,86 @@ Sensitive information such as database credentials and secret keys are not hardc
 
 # Screenshots
 
-## Recommended Screenshots for Submission
+The following screenshots provide evidence that the application is deployed, database-backed, and functioning through the full Flask + PostgreSQL workflow.
 
-Include screenshots of:
+## Application Page Screenshots
 
-* Home page
+### Home Page
+
 ![Home Page](static/images/home.png)
 
-* Portfolio Profiles page
+The Home page introduces the project workflow and summarises the database features demonstrated in the application.
+
+### Portfolio Profiles Page
+
 ![Portfolio Profiles](static/images/portfolio_profiles.png)
 
-* Market Dashboard
+The Portfolio Profiles page demonstrates the Create and Read parts of CRUD for client portfolio records. It allows the user to create a portfolio profile and review saved portfolio mandate data.
+
+### Market Dashboard Page
+
 ![Market Dashboard](static/images/market_dashboard.png)
 
-* Portfolio Performance page
+The Market Dashboard provides a stock and ETF screening interface. It includes filtering, ranking, suggested allocation weights, and the ability to send selected holdings to the database through a Flask API route.
+
+### Portfolio Performance Page
+
 ![Portfolio Performance](static/images/portfolio_performance.png)
 
-* Contact page
+The Portfolio Performance page reads saved holdings from PostgreSQL and displays portfolio-level performance summaries, allocation status, average scores, volatility, beta, and saved holdings.
+
+### Contact Page
+
 ![Contact Page](static/images/contact.png)
 
-
-* PostgreSQL database tables
-* Render deployment dashboard
-* CRUD workflow example
+The Contact page demonstrates form submission and database persistence using the ContactMessage SQLAlchemy model.
 
 ---
+
+## PostgreSQL Database Evidence
+
+### Portfolio Table
+
+![Portfolio Database Table](static/images/porfolio_database.png)
+
+This screenshot shows saved portfolio records in the PostgreSQL database. It evidences the Create and Read functionality for the Portfolio model.
+
+### Portfolio Holding Table
+
+![Portfolio Holding Database Table](static/images/portfolio_holding_database.png)
+
+This screenshot shows saved holdings in the PostgreSQL database. It evidences database persistence for selected stocks and ETFs assigned to client portfolios.
+
+### Contact Message Table
+
+![Contact Message Database Table](static/images/contact_database.png)
+
+This screenshot shows a saved contact message record in PostgreSQL. It demonstrates that contact form submissions are stored in the database.
+
+---
+
+## Deployment Evidence
+
+### Render Deployment Dashboard
+
+![Render Deployment](static/images/render_deploymnet.png)
+
+This screenshot shows the Render web service deployed successfully and live. It provides evidence that the application is hosted and accessible through the public deployment URL.
+
+---
+
+## CRUD Workflow Evidence
+
+The screenshots above collectively demonstrate the complete CRUD workflow:
+
+| CRUD Operation | Evidence in Application | Evidence in Database |
+| -------------- | ----------------------- | -------------------- |
+| Create | Portfolio Profiles form, Contact form, Add Stock workflow | Portfolio, PortfolioHolding, and ContactMessage tables |
+| Read | Portfolio Profiles page, Market Dashboard, Portfolio Performance page | Saved database rows visible in PostgreSQL tables |
+| Update | Existing portfolios and repeated saved holdings can be updated | Existing records are reused rather than duplicated |
+| Delete | Delete buttons for saved portfolio holdings | Records can be removed from the PortfolioHolding table |
 
 # Deployment Notes for Marker
-
-## Live Deployment URL
-
-```text
-https://database-qsl-project.onrender.com
-```
-
----
 
 ## Render Build Command
 
@@ -615,20 +571,16 @@ https://database-qsl-project.onrender.com
 pip install -r requirements.txt
 ```
 
----
-
 ## Render Start Command
 
 ```bash
 gunicorn app:app
 ```
 
----
-
 ## Required Render Environment Variables
 
 ```text
-SECRET_KEY=<secure-secret-key>
+SECRET_KEY=<secure secret key>
 DATABASE_URL=<Neon PostgreSQL connection string>
 ```
 
@@ -636,8 +588,13 @@ The real `.env` file is intentionally not submitted because it contains private 
 
 ---
 
-# Academic Note
+# Database Migration Note
 
-This application was developed for educational and academic purposes.
+If the hosted PostgreSQL database was created before the final timestamp update, run:
 
-The portfolio analysis calculations and investment outputs are simplified educational models and should not be interpreted as professional financial advice.
+```text
+database_migration_distinction_update.sql
+```
+
+
+inside the Neon SQL Editor before redeploying the final version.
