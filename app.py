@@ -1295,15 +1295,16 @@ def build_market_rows():
 
     for ticker in dashboard_tickers:
         metrics_1y = compute_metrics_from_batch(batch_data, ticker)
-        
-        
-        # Use the same scoring engine as the main analysis page.
+
+        currency = CURRENCY_MAP.get(ticker, "USD")
+
         decision_pack = score_and_decide(
             expected_return=metrics_1y["annualised_expected_return"],
             volatility=metrics_1y["annualised_volatility"],
             sharpe_like=metrics_1y["sharpe_like"],
-            beta=None,  # Beta not used in dashboard ranking.
+            beta=None,
         )
+        
 
         # Ranking score: a simple weighted formula to sort tickers by attractiveness.
         ranking_score = (
