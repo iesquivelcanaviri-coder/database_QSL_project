@@ -187,7 +187,8 @@
             <tr> 
                 <th data-sort="ticker">Ticker</th> 
                 <th data-sort="latest_price">Latest Price</th>
-                <th data-sort="expected_return_percent">Expected Return</th> 
+                <th data-sort="currency">Currency</th>
+                <th data-sort="expected_return_percent">Expected Return</th>
                 <th data-sort="score">Score</th> 
                 <th data-sort="decision">Decision</th> 
                 <th data-sort="tag">Tag</th> 
@@ -218,8 +219,10 @@
                     class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" 
                 > 
                     <td>{{ row.ticker }}</td> 
-                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td> 
-                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td> 
+                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td>
+                    <td>{{ row.currency if row.currency is not none else "N/A" }}</td>
+                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}
+                         {% if row.expected_return_percent is not none %}%{% endif %}</td>
                     <td>{{ row.score if row.score is not none else "N/A" }}</td> 
                     <td>{{ row.decision }}</td> 
                     <td><span class="tag">{{ row.tag }}</span></td> 

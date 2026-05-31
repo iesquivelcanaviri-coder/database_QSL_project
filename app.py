@@ -1283,6 +1283,21 @@ def build_market_rows():
 
     for ticker in dashboard_tickers:
         metrics_1y = compute_metrics_from_batch(batch_data, ticker)
+        
+        # ------------------------------------------------------------
+        # Currency Lookup
+        # ------------------------------------------------------------
+        try:
+            ticker_info = yf.Ticker(ticker).info
+
+            currency = (
+                ticker_info.get("currency")
+                or ticker_info.get("financialCurrency")
+                or "N/A"
+            )
+
+        except Exception:
+            currency = "N/A"
 
         # Use the same scoring engine as the main analysis page.
         decision_pack = score_and_decide(
@@ -1302,6 +1317,7 @@ def build_market_rows():
         rows.append({
             "ticker": ticker,
             "latest_price": round(metrics_1y["latest_price"], 2),
+            "currency": currency,
             "score": decision_pack["score"],
             "decision": decision_pack["decision"],
             "tag": decision_pack["tag"],
