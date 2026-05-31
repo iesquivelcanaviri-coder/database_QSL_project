@@ -416,8 +416,14 @@ portfolio-database-project/
 ├── static/
 │   ├── css/
 │   │   └── style.css
-│   └── js/
-│       └── script.js
+│   ├── js/
+│   │   └── script.js
+│   └── images/
+│       ├── home.png
+│       ├── portfolio_profiles.png
+│       ├── market_dashboard.png
+│       ├── portfolio_performance.png
+│       └── contact.png
 ├── templates/
 │   ├── base.html
 │   ├── _navbar.html
@@ -572,10 +578,15 @@ Sensitive information such as database credentials and secret keys are not hardc
 Include screenshots of:
 
 * Home page
+![Home Page](static/images/home.png)
 * Portfolio Profiles page
+![Portfolio Profiles](static/images/portfolio_profiles.png)
 * Market Dashboard
+![Market Dashboard](static/images/market_dashboard.png)
 * Portfolio Performance page
+![Portfolio Performance](static/images/portfolio_performance.png)
 * Contact page
+![Contact Page](static/images/contact.png)
 * PostgreSQL database tables
 * Render deployment dashboard
 * CRUD workflow example
