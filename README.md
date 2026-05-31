@@ -579,14 +579,20 @@ Include screenshots of:
 
 * Home page
 ![Home Page](static/images/home.png)
+
 * Portfolio Profiles page
 ![Portfolio Profiles](static/images/portfolio_profiles.png)
+
 * Market Dashboard
 ![Market Dashboard](static/images/market_dashboard.png)
+
 * Portfolio Performance page
 ![Portfolio Performance](static/images/portfolio_performance.png)
+
 * Contact page
 ![Contact Page](static/images/contact.png)
+
+
 * PostgreSQL database tables
 * Render deployment dashboard
 * CRUD workflow example
