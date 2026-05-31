@@ -1,215 +1,235 @@
-{% extends "base.html" %}
-{% block title %}Market Dashboard | PostgreSQL Portfolio App{% endblock %}
+<!-- ======= TEMPLATE METADATA ======= -->
+<!-- ------------- Top-level template declaration and title block; this sets up how the page plugs into the base layout and what appears in the browser tab. ------------- -->
 
-{% block content %}
+{% extends "base.html" %} <!-- This tells Jinja to inherit from base.html so we reuse the common layout (header, footer, nav). It keeps the project DRY and makes it easy to change the overall site chrome in one place, which is super handy when you’re iterating on a student project. -->
+{% block title %}Market Dashboard | PostgreSQL Portfolio App{% endblock %} <!-- This overrides the title block in the base template so the browser tab shows a meaningful name for this page; it helps graders and users quickly identify where they are. -->
 
-<h1>Market Dashboard</h1>
+<!-- ======= PAGE CONTENT ======= -->
+<!-- ------------- Everything visible on this page goes inside the content block; child templates inject UI here while the base handles the outer frame. ------------- -->
 
-<div class="card">
-    <h2>Assign a Stock to a Portfolio Profile</h2>
+{% block content %} <!-- Start of the content block — this is where the Market Dashboard’s UI is defined and will be inserted into the base layout. It keeps the layout consistent while letting this page define its own content. -->
 
-    <p>
+<h1>Market Dashboard</h1> <!-- Main heading for the page; it immediately tells the user what this page is about and sets expectations for the content below, which is helpful when someone is scanning the app quickly. -->
+
+<!-- ======= ASSIGN STOCK CARD ======= -->
+<!-- ------------- This card explains how to assign a stock to a portfolio and connects the dashboard to the portfolio workflow. ------------- -->
+
+<div class="card"> <!-- Card container groups related content visually so the UI is easier to scan and feels organized, which is nice for both users and graders. -->
+    <h2>Assign a Stock to a Portfolio Profile</h2> <!-- Subheading that labels the purpose of this card so users know they can assign securities to portfolios from here. -->
+
+    <p> <!-- Intro paragraph explaining the connection between pages in plain language so non-technical users can follow the workflow. -->
         This page connects the <strong>Portfolio Profiles</strong> page to the
         <strong>Portfolio Performance</strong> page.
-    </p>
+    </p> <!-- End of the short explanation — it orients the user to the app’s flow. -->
 
-    <p>
+    <p> <!-- Longer paragraph that explains the exact action flow and which API route handles the assignment, which is useful for reviewers and for debugging. -->
         First select a saved portfolio profile, then select a stock or ETF.
         When you click <strong>Analyse and Save Holding</strong>, the app sends the
         selected portfolio and ticker to the Flask <strong>/add-to-portfolio</strong>
         API route. The holding is saved in the database and then appears on the
         Portfolio Performance page.
-    </p>
-</div>
+    </p> <!-- End of the detailed explanation — this clarifies what happens behind the scenes when the form is submitted. -->
+</div> <!-- End of the assign-stock card. -->
 
-<div class="card">
-    <h2>Add Stock to Selected Portfolio</h2>
+<!-- ======= QUICK ADD FORM CARD ======= -->
+<!-- ------------- This card contains a quick form to add a selected ticker to a chosen portfolio; it’s a streamlined workflow for portfolio managers. ------------- -->
 
-    <form id="quick-add-form">
+<div class="card"> <!-- Card wrapper for the quick-add form so the form is visually separated from the rest of the dashboard. -->
+    <h2>Add Stock to Selected Portfolio</h2> <!-- Subheading that tells the user this is the quick add form for assigning holdings. -->
 
-        <div class="form-grid">
+    <form id="quick-add-form"> <!-- The form uses an id so JavaScript can intercept submission and show inline messages; keeping the form id-based makes the client-side code simpler and more testable. -->
 
-            <div>
-                <label for="quick_portfolio_key">Select Portfolio Profile</label>
+        <div class="form-grid"> <!-- A grid layout groups the portfolio selector and ticker selector side-by-side on wider screens for a compact, efficient UI. -->
 
-                <select id="quick_portfolio_key" name="portfolio_key" required>
-                    <option value="">-- Choose a portfolio profile --</option>
+            <div> <!-- First column: portfolio selector. -->
+                <label for="quick_portfolio_key">Select Portfolio Profile</label> <!-- Label tied to the select for accessibility and clarity. -->
+                <select id="quick_portfolio_key" name="portfolio_key" required> <!-- The select lists saved portfolio profiles; required prevents empty submissions and nudges the user to choose a profile. -->
+                    <option value="">-- Choose a portfolio profile --</option> <!-- A placeholder option that prompts the user to make a selection and prevents accidental default choices. -->
 
-                    {% for portfolio in portfolio_choices %}
-                        <option value="{{ portfolio.key }}">
-                            {{ portfolio.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+                    {% for portfolio in portfolio_choices %} <!-- Loop through portfolio choices passed from the view; this keeps the UI dynamic and driven by the database. -->
+                        <option value="{{ portfolio.key }}"> <!-- Each option value is the portfolio key so the backend can identify which profile to attach the holding to. -->
+                            {{ portfolio.name }} <!-- The visible text shows the portfolio name so users can pick the right client or mandate. -->
+                        </option> <!-- End of the portfolio option. -->
+                    {% endfor %} <!-- End of the portfolio loop. -->
+                </select> <!-- End of the portfolio select. -->
+            </div> <!-- End of the first column. -->
 
-            <div>
-                <label for="quick_ticker">Select Stock / ETF</label>
+            <div> <!-- Second column: ticker selector. -->
+                <label for="quick_ticker">Select Stock / ETF</label> <!-- Label for the ticker select to improve accessibility and clarity. -->
 
-                <select id="quick_ticker" name="ticker" required>
-                    <option value="">-- Choose a stock or ETF --</option>
+                <select id="quick_ticker" name="ticker" required> <!-- The ticker select lists available securities; required ensures a ticker is chosen before submission. -->
+                    <option value="">-- Choose a stock or ETF --</option> <!-- Placeholder option to prompt selection. -->
 
-                    {% for row in rows %}
-                        <option value="{{ row.ticker }}">
-                            {{ row.ticker }} — {{ row.tag }} — {{ row.suggested_weight }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+                    {% for row in rows %} <!-- Loop through the market rows provided by the backend; this makes the list reflect the current dataset. -->
+                        <option value="{{ row.ticker }}"> <!-- The option value is the ticker symbol so the backend receives a concise identifier. -->
+                            {{ row.ticker }} — {{ row.tag }} — {{ row.suggested_weight }} <!-- The visible option includes ticker, tag, and suggested weight to help the user make an informed quick choice without opening the table. -->
+                        </option> <!-- End of the ticker option. -->
+                    {% endfor %} <!-- End of the ticker loop. -->
+                </select> <!-- End of the ticker select. -->
+            </div> <!-- End of the second column. -->
 
-        </div>
+        </div> <!-- End of the form grid. -->
 
-        <button type="submit">
+        <button type="submit"> <!-- Submit button triggers the quick-add workflow; JavaScript can intercept to show inline feedback without a full page reload. -->
             Analyse and Save Holding
-        </button>
+        </button> <!-- End of the submit button. -->
 
-    </form>
+    </form> <!-- End of the quick-add form. -->
 
-    <div id="quick-add-message" class="trade-message"></div>
-</div>
+    <div id="quick-add-message" class="trade-message"></div> <!-- Placeholder for inline messages (success/error) after the quick-add action; using an id makes it easy for JS to update the content dynamically. -->
+</div> <!-- End of the quick-add card. -->
 
-<div class="card">
-    <h2>What this dashboard does</h2>
+<!-- ======= DASHBOARD DESCRIPTION CARD ======= -->
+<!-- ------------- This card explains what the dashboard is for and defines the smart presets so users understand the filtering presets. ------------- -->
 
-    <p>
+<div class="card"> <!-- Card that explains the dashboard’s purpose and the meaning of presets so users can interpret results correctly. -->
+    <h2>What this dashboard does</h2> <!-- Subheading that introduces the explanatory content. -->
+
+    <p> <!-- Paragraph describing the dashboard’s role in the investment workflow and the available filters. -->
         This page helps a portfolio manager screen securities before assigning them
         to a portfolio. The table below can be filtered by ticker, decision, score,
         volatility, and Sharpe-like ratio.
-    </p>
+    </p> <!-- End of the description paragraph. -->
 
-    <p>
+    <p> <!-- Paragraph linking the filtered table to the quick-add form and explaining how they work together. -->
         The filtered table supports the investment workflow, while the form above
         performs the database-backed stock-to-profile assignment.
-    </p>
+    </p> <!-- End of the second paragraph. -->
 
-    <h3>What each smart preset means</h3>
+    <h3>What each smart preset means</h3> <!-- Sub-subheading that introduces the preset definitions so users know what each button does. -->
 
-    <p><strong>Low Risk:</strong> highlights more stable securities with lower volatility.</p>
-    <p><strong>High Conviction:</strong> identifies the strongest investment ideas based on score and risk-adjusted performance.</p>
-    <p><strong>Core Holdings:</strong> represents stable, well-balanced investments suitable for foundation positions.</p>
-    <p><strong>Satellite / Diversifiers:</strong> includes supporting positions used to improve diversification.</p>
-    <p><strong>Exploratory / High Risk:</strong> captures higher-risk ideas that should normally receive smaller allocations.</p>
-    <p><strong>Income / Defensive:</strong> focuses on defensive or income-oriented securities.</p>
-    <p><strong>Best Ranked:</strong> highlights securities with stronger dashboard scores.</p>
-    <p><strong>Cash:</strong> represents cases where the security does not meet the investment criteria.</p>
-</div>
+    <p><strong>Low Risk:</strong> highlights more stable securities with lower volatility.</p> <!-- Definition for Low Risk preset so users understand the selection criteria. -->
+    <p><strong>High Conviction:</strong> identifies the strongest investment ideas based on score and risk-adjusted performance.</p> <!-- Definition for High Conviction preset to clarify intent and expected results. -->
+    <p><strong>Core Holdings:</strong> represents stable, well-balanced investments suitable for foundation positions.</p> <!-- Definition for Core Holdings to help users pick base allocations. -->
+    <p><strong>Satellite / Diversifiers:</strong> includes supporting positions used to improve diversification.</p> <!-- Definition for Satellite / Diversifiers to explain their role in a portfolio. -->
+    <p><strong>Exploratory / High Risk:</strong> captures higher-risk ideas that should normally receive smaller allocations.</p> <!-- Definition for Exploratory / High Risk to warn about allocation sizing. -->
+    <p><strong>Income / Defensive:</strong> focuses on defensive or income-oriented securities.</p> <!-- Definition for Income / Defensive to indicate yield or defensive characteristics. -->
+    <p><strong>Best Ranked:</strong> highlights securities with stronger dashboard scores.</p> <!-- Definition for Best Ranked to show top-scoring ideas. -->
+    <p><strong>Cash:</strong> represents cases where the security does not meet the investment criteria.</p> <!-- Definition for Cash to indicate when holding cash is preferable to buying the security. -->
+</div> <!-- End of the dashboard description card. -->
 
-<div class="card">
-    <h2>Smart Filters</h2>
+<!-- ======= FILTERS CARD ======= -->
+<!-- ------------- Smart filters let users narrow the table by ticker, decision, score, volatility, and Sharpe-like ratio; presets provide quick filter sets. ------------- -->
 
-    <div class="filters-grid">
+<div class="card"> <!-- Card wrapper for the filters and preset buttons so they are visually grouped and easy to find. -->
+    <h2>Smart Filters</h2> <!-- Subheading for the filters section. -->
 
-        <div>
-            <label for="ticker-filter">Ticker</label>
-            <select id="ticker-filter">
-                <option value="">All tickers</option>
-                {% for ticker in rows | map(attribute='ticker') | list | sort %}
-                    <option value="{{ ticker }}">{{ ticker }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    <div class="filters-grid"> <!-- Grid layout for filter controls to keep them compact and aligned. -->
 
-        <div>
-            <label for="decision-filter">Decision</label>
-            <select id="decision-filter">
-                <option value="">All decisions</option>
-                <option value="YES — high conviction">YES — high conviction</option>
-                <option value="YES — core holding">YES — core holding</option>
-                <option value="YES — satellite">YES — satellite</option>
-                <option value="LIMITED — high risk / exploratory">LIMITED — high risk / exploratory</option>
-                <option value="NO — hold as cash instead">NO — hold as cash instead</option>
-            </select>
-        </div>
+        <div> <!-- Ticker filter control. -->
+            <label for="ticker-filter">Ticker</label> <!-- Label for the ticker filter select. -->
+            <select id="ticker-filter"> <!-- Select lists unique tickers so users can filter the table to a single security. -->
+                <option value="">All tickers</option> <!-- Default option to show all tickers. -->
+                {% for ticker in rows | map(attribute='ticker') | list | sort %} <!-- Build a sorted list of tickers from rows so the filter options are unique and ordered. -->
+                    <option value="{{ ticker }}">{{ ticker }}</option> <!-- Each option shows the ticker symbol for quick selection. -->
+                {% endfor %} <!-- End of the ticker options loop. -->
+            </select> <!-- End of the ticker select. -->
+        </div> <!-- End of the ticker filter control. -->
 
-        <div>
-            <label for="score-filter">Minimum Score</label>
-            <select id="score-filter">
-                <option value="">Any</option>
-                <option value="3">3+</option>
-                <option value="5">5+</option>
-                <option value="7">7+</option>
-            </select>
-        </div>
+        <div> <!-- Decision filter control. -->
+            <label for="decision-filter">Decision</label> <!-- Label for the decision filter. -->
+            <select id="decision-filter"> <!-- Select lists decision categories so users can filter by analyst decision. -->
+                <option value="">All decisions</option> <!-- Default option to show all decisions. -->
+                <option value="YES — high conviction">YES — high conviction</option> <!-- Option for high conviction buys. -->
+                <option value="YES — core holding">YES — core holding</option> <!-- Option for core holdings. -->
+                <option value="YES — satellite">YES — satellite</option> <!-- Option for satellite positions. -->
+                <option value="LIMITED — high risk / exploratory">LIMITED — high risk / exploratory</option> <!-- Option for limited/high-risk ideas. -->
+                <option value="NO — hold as cash instead">NO — hold as cash instead</option> <!-- Option indicating the security should be held as cash. -->
+            </select> <!-- End of the decision select. -->
+        </div> <!-- End of the decision filter control. -->
 
-        <div>
-            <label for="volatility-filter">Maximum Volatility %</label>
-            <input type="number" id="volatility-filter" step="0.1" placeholder="e.g. 15">
-        </div>
+        <div> <!-- Score filter control. -->
+            <label for="score-filter">Minimum Score</label> <!-- Label for the minimum score filter. -->
+            <select id="score-filter"> <!-- Select for minimum score thresholds to filter by analyst score. -->
+                <option value="">Any</option> <!-- Default option to allow any score. -->
+                <option value="3">3+</option> <!-- Option to show scores 3 and above. -->
+                <option value="5">5+</option> <!-- Option to show scores 5 and above. -->
+                <option value="7">7+</option> <!-- Option to show scores 7 and above. -->
+            </select> <!-- End of the score select. -->
+        </div> <!-- End of the score filter control. -->
 
-        <div>
-            <label for="sharpe-filter">Minimum Sharpe</label>
-            <input type="number" id="sharpe-filter" step="0.1" placeholder="e.g. 0.5">
-        </div>
+        <div> <!-- Volatility filter control. -->
+            <label for="volatility-filter">Maximum Volatility %</label> <!-- Label for the volatility input. -->
+            <input type="number" id="volatility-filter" step="0.1" placeholder="e.g. 15"> <!-- Numeric input for maximum volatility percentage; step=0.1 allows fractional percentages for finer control. -->
+        </div> <!-- End of the volatility filter control. -->
 
-    </div>
+        <div> <!-- Sharpe-like filter control. -->
+            <label for="sharpe-filter">Minimum Sharpe</label> <!-- Label for the Sharpe-like ratio input. -->
+            <input type="number" id="sharpe-filter" step="0.1" placeholder="e.g. 0.5"> <!-- Numeric input for minimum Sharpe-like ratio; step=0.1 gives reasonable precision for screening. -->
+        </div> <!-- End of the Sharpe filter control. -->
 
-    <div class="filter-actions">
-        <button type="button" id="preset-low-risk">Low Risk</button>
-        <button type="button" id="preset-high-conviction">High Conviction</button>
-        <button type="button" id="preset-core">Core Holdings</button>
-        <button type="button" id="preset-satellite">Satellite / Diversifiers</button>
-        <button type="button" id="preset-exploratory">Exploratory / High Risk</button>
-        <button type="button" id="preset-income">Income / Defensive</button>
-        <button type="button" id="preset-best-ranked">Best Ranked</button>
-        <button type="button" id="preset-cash">Cash</button>
-        <button type="button" id="clear-filters">Clear Filters</button>
-    </div>
+    </div> <!-- End of the filters grid. -->
 
-    <p id="dashboard-summary" class="muted">Showing all securities.</p>
-</div>
+    <div class="filter-actions"> <!-- Container for preset buttons so they are grouped and easy to click. -->
+        <button type="button" id="preset-low-risk">Low Risk</button> <!-- Preset button that applies the low-risk filter set; quick shortcuts like this speed up the workflow. -->
+        <button type="button" id="preset-high-conviction">High Conviction</button> <!-- Preset for high conviction ideas. -->
+        <button type="button" id="preset-core">Core Holdings</button> <!-- Preset for core holdings. -->
+        <button type="button" id="preset-satellite">Satellite / Diversifiers</button> <!-- Preset for satellite/diversifier positions. -->
+        <button type="button" id="preset-exploratory">Exploratory / High Risk</button> <!-- Preset for exploratory/high-risk ideas. -->
+        <button type="button" id="preset-income">Income / Defensive</button> <!-- Preset for income/defensive candidates. -->
+        <button type="button" id="preset-best-ranked">Best Ranked</button> <!-- Preset for best-ranked securities by dashboard score. -->
+        <button type="button" id="preset-cash">Cash</button> <!-- Preset for cash candidates. -->
+        <button type="button" id="clear-filters">Clear Filters</button> <!-- Button to reset all filters and show the full table again. -->
+    </div> <!-- End of the filter actions container. -->
 
-<div class="card">
-    <h2>Yahoo Finance Market Table</h2>
+    <p id="dashboard-summary" class="muted">Showing all securities.</p> <!-- Summary text that updates based on filters to tell the user what subset of securities is currently visible; muted styling keeps it unobtrusive. -->
+</div> <!-- End of the filters card. -->
 
-    <table class="table" id="market-table">
-        <thead>
-            <tr>
-                <th data-sort="ticker">Ticker</th>
-                <th data-sort="latest_price">Latest Price</th>
-                <th data-sort="expected_return_percent">Expected Return</th>
-                <th data-sort="score">Score</th>
-                <th data-sort="decision">Decision</th>
-                <th data-sort="tag">Tag</th>
-                <th data-sort="suggested_weight">Suggested Weight</th>
-                <th data-sort="volatility">Volatility</th>
-                <th data-sort="sharpe_like">Sharpe</th>
-                <th data-sort="ranking_score">Ranking Score</th>
-            </tr>
-        </thead>
+<!-- ======= MARKET TABLE CARD ======= -->
+<!-- ------------- The main market table displays rows of securities with sortable columns and data attributes used by client-side filtering and styling. ------------- -->
 
-        <tbody>
-            {% for row in rows %}
+<div class="card"> <!-- Card wrapper for the market table so it’s visually separated from filters and forms. -->
+    <h2>Yahoo Finance Market Table</h2> <!-- Subheading that names the data source and purpose of the table. -->
+
+    <table class="table" id="market-table"> <!-- The table holds the market rows; an id makes it easy for JavaScript to attach sorting and filtering behavior. -->
+        <thead> <!-- Table header defines column names and sorting metadata. -->
+            <tr> <!-- Header row with sortable column definitions via data-sort attributes. -->
+                <th data-sort="ticker">Ticker</th> <!-- Column for ticker symbol; data-sort attribute helps client-side sorting logic. -->
+                <th data-sort="latest_price">Latest Price</th> <!-- Column for the latest market price. -->
+                <th data-sort="expected_return_percent">Expected Return</th> <!-- Column for expected return percentage. -->
+                <th data-sort="score">Score</th> <!-- Column for the analyst score. -->
+                <th data-sort="decision">Decision</th> <!-- Column for the buy/hold/avoid decision. -->
+                <th data-sort="tag">Tag</th> <!-- Column for tag/category (e.g., sector or theme). -->
+                <th data-sort="suggested_weight">Suggested Weight</th> <!-- Column for suggested portfolio weight. -->
+                <th data-sort="volatility">Volatility</th> <!-- Column for volatility percentage. -->
+                <th data-sort="sharpe_like">Sharpe</th> <!-- Column for the Sharpe-like ratio. -->
+                <th data-sort="ranking_score">Ranking Score</th> <!-- Column for the overall ranking score used to sort ideas. -->
+            </tr> <!-- End of the header row. -->
+        </thead> <!-- End of the table header. -->
+
+        <tbody> <!-- Table body where each market row becomes a table row with data attributes for filtering. -->
+            {% for row in rows %} <!-- Loop through each row in the dataset provided by the backend; this keeps the table dynamic and data-driven. -->
                 <tr
-                    data-ticker="{{ row.ticker }}"
-                    data-decision="{{ row.decision }}"
-                    data-score="{{ row.score if row.score is not none else '' }}"
-                    data-volatility="{{ row.volatility if row.volatility is not none else '' }}"
-                    data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}"
-                    data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}"
-                    data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}"
-                    data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}"
-                    data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}"
-                    data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}"
-                    data-satellite="{{ 'true' if row.is_satellite else 'false' }}"
-                    data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}"
-                    data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}"
-                    data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}"
-                    class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}"
-                >
-                    <td>{{ row.ticker }}</td>
-                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td>
-                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td>
-                    <td>{{ row.score if row.score is not none else "N/A" }}</td>
-                    <td>{{ row.decision }}</td>
-                    <td><span class="tag">{{ row.tag }}</span></td>
-                    <td>{{ row.suggested_weight }}</td>
-                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td>
-                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td>
-                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                    data-ticker="{{ row.ticker }}" <!-- Data attribute for ticker used by filters and JS. -->
+                    data-decision="{{ row.decision }}" <!-- Data attribute for decision category. -->
+                    data-score="{{ row.score if row.score is not none else '' }}" <!-- Data attribute for score; empty string if none to avoid literal 'None' values in HTML. -->
+                    data-volatility="{{ row.volatility if row.volatility is not none else '' }}" <!-- Data attribute for volatility; empty if not available. -->
+                    data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}" <!-- Data attribute for Sharpe-like ratio; empty if not available. -->
+                    data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}" <!-- Data attribute for ranking score; empty if not available. -->
+                    data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}" <!-- Boolean data attribute indicating income candidate status for preset filtering. -->
+                    data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}" <!-- Boolean attribute for low-risk preset. -->
+                    data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}" <!-- Boolean attribute for high-conviction preset. -->
+                    data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}" <!-- Boolean attribute for core-holding preset. -->
+                    data-satellite="{{ 'true' if row.is_satellite else 'false' }}" <!-- Boolean attribute for satellite preset. -->
+                    data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}" <!-- Boolean attribute for exploratory preset. -->
+                    data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}" <!-- Boolean attribute for cash candidate preset. -->
+                    data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}" <!-- Boolean attribute for best-ranked preset. -->
+                    class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" <!-- Conditional class to visually highlight rows based on score thresholds; this helps users spot top ideas quickly. -->
+                > <!-- End of the opening tr tag with many data attributes used by client-side logic. -->
+                    <td>{{ row.ticker }}</td> <!-- Ticker cell — the primary identifier for the security. -->
+                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td> <!-- Latest price cell with fallback to "N/A" if data is missing, which keeps the table readable. -->
+                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td> <!-- Expected return cell with a percent sign appended only when a value exists, so the display is clean and unambiguous. -->
+                    <td>{{ row.score if row.score is not none else "N/A" }}</td> <!-- Score cell with fallback to "N/A" to avoid showing blank or confusing values. -->
+                    <td>{{ row.decision }}</td> <!-- Decision cell showing the analyst recommendation text. -->
+                    <td><span class="tag">{{ row.tag }}</span></td> <!-- Tag cell wrapped in a span for styling; tags help categorize securities visually. -->
+                    <td>{{ row.suggested_weight }}</td> <!-- Suggested weight cell showing the recommended allocation percentage or weight. -->
+                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> <!-- Volatility cell with percent sign appended only when a value exists, keeping the formatting consistent. -->
+                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> <!-- Sharpe-like ratio cell with fallback to "N/A". -->
+                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> <!-- Ranking score cell with fallback to "N/A" so missing data is explicit. -->
+                </tr> <!-- End of the data row for this security. -->
+            {% endfor %} <!-- End of the loop over market rows. -->
+        </tbody> <!-- End of the table body. -->
+    </table> <!-- End of the market table. -->
+</div> <!-- End of the market table card. -->
 
-{% endblock %}
+{% endblock %} <!-- End of the content block — this closes the Market Dashboard’s content so the base template can render the full page. -->

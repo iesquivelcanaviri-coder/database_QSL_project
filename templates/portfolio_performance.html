@@ -1,109 +1,114 @@
-{% extends "base.html" %}
+<!-- ======= TEMPLATE METADATA ======= -->
+<!-- ------------- Top-level template declaration and title block; this sets up how the page plugs into the base layout and what appears in the browser tab. ------------- -->
 
-{% block title %}
-Portfolio Performance | PostgreSQL Portfolio App
-{% endblock %}
+{% extends "base.html" %} <!-- This tells Jinja to inherit from base.html so we reuse the common layout (header, footer, nav). It’s like starting from a skeleton and only filling in the parts that matter for this page, which keeps the project tidy and easy to maintain. -->
+{% block title %} <!-- ======= TITLE BLOCK ======= --> <!-- ------------- The title block is overridden here so the browser tab shows a page-specific name; using a block makes the title flexible for each page. ------------- -->
+Portfolio Performance | PostgreSQL Portfolio App <!-- This is the text that will appear in the browser tab; it’s descriptive so graders and users immediately know which page they’re on. -->
+{% endblock %} <!-- End of the title block so the base template can continue rendering the rest of the layout. -->
 
-{% block content %}
+<!-- ======= PAGE CONTENT SECTION ======= -->
+<!-- ------------- Everything visible on this page goes inside the content block; child templates inject UI here while the base handles the outer frame. ------------- -->
 
-<div class="card">
-    <h1>Portfolio Performance Review</h1>
+{% block content %} <!-- Start of the content block — this is where the Portfolio Performance UI is defined and will be inserted into the base layout. It keeps the outer layout consistent while letting this page define its own content. -->
 
-    <p>
+<div class="card"> <!-- Card container groups the introductory content visually so the UI is easier to scan and feels organized, which is helpful for both users and graders. -->
+    <h1>Portfolio Performance Review</h1> <!-- Main heading that tells the user what this page is about right away; clear headings help orient readers and make the app feel polished. -->
+
+    <p> <!-- Intro paragraph explaining the purpose of the page in plain language so non-technical users can understand what the dashboard does without reading the code. -->
         This page replaces the old criteria explanation page with a database-backed
         portfolio performance dashboard. It compares portfolios using their saved holdings.
-    </p>
+    </p> <!-- End of the short explanation — it orients the user to the app’s purpose. -->
 
-    <p>
+    <p> <!-- Paragraph describing the goal of the performance review and the metrics used so reviewers know what to expect from the analysis. -->
         The purpose is to show which portfolios are doing well, which are mixed,
         and which need review based on average score, expected return, volatility,
         beta, allocation, and cash remaining.
-    </p>
-</div>
+    </p> <!-- End of the purpose paragraph — it clarifies the evaluation criteria for each portfolio. -->
+</div> <!-- End of the intro card that explains the page purpose. -->
 
-<div class="card">
-    <h2>Portfolio Performance Summary</h2>
+<div class="card"> <!-- Card for the summary table so the overview metrics are grouped and easy to find. -->
+    <h2>Portfolio Performance Summary</h2> <!-- Subheading that labels the summary section so users know the table below is an at-a-glance comparison. -->
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Portfolio</th>
-                <th>Benchmark</th>
-                <th>Positions</th>
-                <th>Total Allocated</th>
-                <th>Remaining Cash</th>
-                <th>Average Score</th>
-                <th>Average Return</th>
-                <th>Average Volatility</th>
-                <th>Average Beta</th>
-                <th>Status</th>
-            </tr>
-        </thead>
+    <table class="table"> <!-- Table to present portfolio-level metrics in a structured, comparable format — tables are ideal for side-by-side comparisons. -->
+        <thead> <!-- Table header defines column names so the data is easy to interpret. -->
+            <tr> <!-- Header row containing column titles. -->
+                <th>Portfolio</th> <!-- Column for the portfolio name so readers can identify which row belongs to which client or mandate. -->
+                <th>Benchmark</th> <!-- Column for the benchmark ticker used to compare performance. -->
+                <th>Positions</th> <!-- Column showing how many holdings are in the portfolio — a quick proxy for diversification. -->
+                <th>Total Allocated</th> <!-- Column for the total percent allocated to holdings, useful to spot under- or over-allocation. -->
+                <th>Remaining Cash</th> <!-- Column for cash left in the portfolio, which indicates room to deploy capital or a defensive stance. -->
+                <th>Average Score</th> <!-- Column for the average analyst score across holdings — a simple quality metric. -->
+                <th>Average Return</th> <!-- Column for the average expected return across holdings — helps compare return potential. -->
+                <th>Average Volatility</th> <!-- Column for average volatility — risk context for the portfolio. -->
+                <th>Average Beta</th> <!-- Column for average beta — shows sensitivity to market movements. -->
+                <th>Status</th> <!-- Column for a human-readable status that summarizes the portfolio health. -->
+            </tr> <!-- End of the header row. -->
+        </thead> <!-- End of the table header. -->
 
-        <tbody>
-            {% for row in performance_rows %}
-                <tr class="{% if row.status == 'Performing well' %}score-high{% elif row.status == 'Mixed / monitor' %}score-medium{% elif row.status == 'Weak / needs review' %}score-low{% endif %}">
-                    <td>{{ row.portfolio_name }}</td>
-                    <td>{{ row.benchmark_ticker }}</td>
-                    <td>{{ row.position_count }}</td>
-                    <td>{{ row.total_allocated_percent }}%</td>
-                    <td>{{ row.remaining_cash_percent }}%</td>
-                    <td>{{ row.average_score if row.average_score is not none else "N/A" }}</td>
-                    <td>
+        <tbody> <!-- Table body where each portfolio summary becomes a row. -->
+            {% for row in performance_rows %} <!-- Loop through performance_rows provided by the backend so the table reflects current database state. -->
+                <tr class="{% if row.status == 'Performing well' %}score-high{% elif row.status == 'Mixed / monitor' %}score-medium{% elif row.status == 'Weak / needs review' %}score-low{% endif %}"> <!-- Conditional class to visually highlight rows based on status; this helps users spot strong or weak portfolios at a glance. -->
+                    <td>{{ row.portfolio_name }}</td> <!-- Portfolio name cell — the primary identifier for the row. -->
+                    <td>{{ row.benchmark_ticker }}</td> <!-- Benchmark ticker cell — useful for context and comparison. -->
+                    <td>{{ row.position_count }}</td> <!-- Number of positions cell — quick indicator of diversification. -->
+                    <td>{{ row.total_allocated_percent }}%</td> <!-- Total allocated percent with a percent sign appended so the value is immediately understandable. -->
+                    <td>{{ row.remaining_cash_percent }}%</td> <!-- Remaining cash percent with percent sign to show liquidity or uninvested capital. -->
+                    <td>{{ row.average_score if row.average_score is not none else "N/A" }}</td> <!-- Average score with fallback to "N/A" to avoid showing blank or confusing values. -->
+                    <td> <!-- Average expected return cell with conditional percent sign for clarity. -->
                         {{ row.average_expected_return if row.average_expected_return is not none else "N/A" }}
                         {% if row.average_expected_return is not none %}%{% endif %}
-                    </td>
-                    <td>
+                    </td> <!-- End of average expected return cell. -->
+                    <td> <!-- Average volatility cell with conditional percent sign so formatting is consistent and clear. -->
                         {{ row.average_volatility if row.average_volatility is not none else "N/A" }}
                         {% if row.average_volatility is not none %}%{% endif %}
-                    </td>
-                    <td>{{ row.average_beta if row.average_beta is not none else "N/A" }}</td>
-                    <td><strong>{{ row.status }}</strong></td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="10">No portfolio performance data is available yet.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                    </td> <!-- End of average volatility cell. -->
+                    <td>{{ row.average_beta if row.average_beta is not none else "N/A" }}</td> <!-- Average beta cell with fallback to "N/A" to indicate missing data explicitly. -->
+                    <td><strong>{{ row.status }}</strong></td> <!-- Status cell emphasized with <strong> so the portfolio health stands out visually. -->
+                </tr> <!-- End of the portfolio summary row. -->
+            {% else %} <!-- If the loop finds no rows, render a friendly placeholder so the table doesn’t look broken or empty. -->
+                <tr> <!-- Placeholder row when there is no performance data. -->
+                    <td colspan="10">No portfolio performance data is available yet.</td> <!-- A single cell spanning all columns that explains the absence of data in plain language. -->
+                </tr> <!-- End of the placeholder row. -->
+            {% endfor %} <!-- End of the loop over performance_rows. -->
+        </tbody> <!-- End of the table body. -->
+    </table> <!-- End of the summary table. -->
+</div> <!-- End of the portfolio performance summary card. -->
 
-<div class="card">
-    <h2>Interpretation Guide</h2>
+<div class="card"> <!-- Card for the interpretation guide so users can translate metrics into actions. -->
+    <h2>Interpretation Guide</h2> <!-- Subheading that introduces the guide which helps users interpret the summary metrics. -->
 
-    <div class="portfolio-summary">
-        <div>
-            <p><strong>Performing well</strong></p>
-            <p>Average holding score is strong and the portfolio has several suitable positions.</p>
-        </div>
+    <div class="portfolio-summary"> <!-- A grouped layout for short, readable explanations of each status category. -->
+        <div> <!-- First interpretation block. -->
+            <p><strong>Performing well</strong></p> <!-- Label for the status. -->
+            <p>Average holding score is strong and the portfolio has several suitable positions.</p> <!-- Short explanation of what "Performing well" means in practice so users know why a portfolio received that status. -->
+        </div> <!-- End of the first interpretation block. -->
 
-        <div>
-            <p><strong>Mixed / monitor</strong></p>
-            <p>Some holdings are acceptable, but the portfolio may need further review.</p>
-        </div>
+        <div> <!-- Second interpretation block. -->
+            <p><strong>Mixed / monitor</strong></p> <!-- Label for the status. -->
+            <p>Some holdings are acceptable, but the portfolio may need further review.</p> <!-- Explanation that signals caution and suggests follow-up actions like rebalancing or deeper analysis. -->
+        </div> <!-- End of the second interpretation block. -->
 
-        <div>
-            <p><strong>Weak / needs review</strong></p>
-            <p>Average score is low or holdings do not strongly support the mandate.</p>
-        </div>
+        <div> <!-- Third interpretation block. -->
+            <p><strong>Weak / needs review</strong></p> <!-- Label for the status. -->
+            <p>Average score is low or holdings do not strongly support the mandate.</p> <!-- Explanation that indicates the portfolio likely needs intervention, such as replacing weak holdings or adjusting allocations. -->
+        </div> <!-- End of the third interpretation block. -->
 
-        <div>
-            <p><strong>No holdings yet</strong></p>
-            <p>The portfolio needs securities added from the Market Dashboard.</p>
-        </div>
-    </div>
-</div>
+        <div> <!-- Fourth interpretation block. -->
+            <p><strong>No holdings yet</strong></p> <!-- Label for the status. -->
+            <p>The portfolio needs securities added from the Market Dashboard.</p> <!-- Explanation that tells the user the portfolio is empty and points them to the action (Market Dashboard) to fix it. -->
+        </div> <!-- End of the fourth interpretation block. -->
+    </div> <!-- End of the portfolio-summary group. -->
+</div> <!-- End of the interpretation guide card. -->
 
-<div class="card">
-    <h2>Saved Holdings by Portfolio</h2>
+<div class="card"> <!-- Card for saved holdings by portfolio so users can inspect and manage individual holdings. -->
+    <h2>Saved Holdings by Portfolio</h2> <!-- Subheading that introduces the holdings section. -->
 
-    <p class="muted">
+    <p class="muted"> <!-- Muted explanatory paragraph that clarifies where the data comes from and what actions are demonstrated. -->
         This section is read from the PortfolioHolding table. Delete buttons demonstrate
         the DELETE part of CRUD.
-    </p>
+    </p> <!-- End of the muted explanatory paragraph. -->
 
-    <div id="portfolio-groups"></div>
-</div>
+    <div id="portfolio-groups"></div> <!-- Placeholder div where client-side code will render grouped holdings per portfolio; using an id makes it easy for JS to populate this area dynamically. -->
+</div> <!-- End of the saved holdings card. -->
 
-{% endblock %}
+{% endblock %} <!-- End of the content block so the base template knows where page-specific content ends. -->

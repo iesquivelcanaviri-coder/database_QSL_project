@@ -756,9 +756,9 @@ def make_profile_data(name, client_type, risk_profile, objective, currency, benc
         },
     }
 
-# ------------------------------------------------------------
-# DATABASE SEEDING FUNCTIONS
-# ------------------------------------------------------------
+        # ------------------------------------------------------------
+        # DATABASE SEEDING FUNCTIONS
+        # ------------------------------------------------------------
 def seed_default_portfolios():  # seeds the database with default portfolios if it's empty
     """Insert the default portfolio scenarios if the database is empty.
 

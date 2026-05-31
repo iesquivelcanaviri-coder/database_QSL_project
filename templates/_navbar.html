@@ -1,7 +1,8 @@
-<div class="navbar">
-    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-    <a href="{{ url_for('portfolio_profiles') }}" class="{% if active_page == 'portfolio_profiles' %}active{% endif %}">Portfolio Profiles</a>
-    <a href="{{ url_for('market_dashboard') }}" class="{% if active_page == 'market_dashboard' %}active{% endif %}">Market Dashboard</a>
-    <a href="{{ url_for('portfolio_performance') }}" class="{% if active_page == 'portfolio_performance' %}active{% endif %}">Portfolio Performance</a>
-    <a href="{{ url_for('contact') }}" class="{% if active_page == 'contact' %}active{% endif %}">Contact</a>
-</div>
+
+<div class="navbar"> <!-- This <div> acts as the main container for the entire navigation bar. It keeps all the menu links grouped together so they can be styled consistently and visually feel like one unified navigation area across the whole app. -->
+    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">Home</a> <!-- This link takes the user to the Home page. The url_for('home') ensures the link always points to the correct route even if the URL changes later. The conditional class adds 'active' when the user is currently on the home page, giving a highlighted effect so the user always knows where they are in the app. -->
+    <a href="{{ url_for('portfolio_profiles') }}" class="{% if active_page == 'portfolio_profiles' %}active{% endif %}">Portfolio Profiles</a> <!-- This link opens the Portfolio Profiles page, where users can create and review client portfolios. The conditional 'active' class helps visually indicate that this section is currently selected, which improves navigation clarity and reduces confusion for the user. -->
+    <a href="{{ url_for('market_dashboard') }}" class="{% if active_page == 'market_dashboard' %}active{% endif %}">Market Dashboard</a> <!-- This link leads to the Market Dashboard, the data-heavy section where all tickers, metrics, and rankings are displayed. The active-page logic highlights this tab when the user is viewing the dashboard, making the interface feel more intuitive and user-friendly. -->
+    <a href="{{ url_for('portfolio_performance') }}" class="{% if active_page == 'portfolio_performance' %}active{% endif %}">Portfolio Performance</a> <!-- This link takes the user to the Portfolio Performance page, where they can see summaries, risk metrics, and overall portfolio health. The conditional 'active' class ensures the user always knows they are in the performance review section, which is especially helpful when navigating between multiple analytical pages. -->
+    <a href="{{ url_for('contact') }}" class="{% if active_page == 'contact' %}active{% endif %}">Contact</a> <!-- This link opens the Contact page, where users can submit messages or feedback. The active class highlights it when selected, maintaining consistent navigation behavior and helping users feel oriented within the app. -->
+</div> <!-- Closing the navbar container. This marks the end of the navigation bar structure and keeps all the links neatly wrapped inside one styled block. -->

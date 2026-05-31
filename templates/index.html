@@ -1,36 +1,50 @@
-{% extends "base.html" %}
+<!-- ======= TEMPLATE ROOT SECTION ======= -->
+<!-- ------------- This section defines the template inheritance and page title logic. It sets the foundation for how this page plugs into the overall Flask/Jinja structure. ------------- -->
 
-{% block title %}Home | PostgreSQL Portfolio App{% endblock %}
+{% extends "base.html" %} <!-- This line tells Jinja that this page should use the base.html layout as its foundation. It’s like saying “start with the main website skeleton and then fill in the parts I define here,” which keeps the project clean and avoids repeating the same layout code everywhere. -->
 
-{% block content %}
+{% block title %}Home | PostgreSQL Portfolio App{% endblock %} <!-- This block overrides the title placeholder in base.html so the browser tab shows a meaningful name for this specific page. It helps users and graders quickly identify which part of the app they’re on. -->
 
-<div class="card">
-    <h1>Portfolio Management Decision-Support Web Application with PostgreSQL</h1>
-    <p>
+<!-- ======= PAGE CONTENT SECTION ======= -->
+<!-- ------------- Everything inside this block becomes the visible content of the Home page. ------------- -->
+
+{% block content %} <!-- This marks the beginning of the content that will be injected into the base template’s content area. It keeps the layout consistent while letting each page define its own unique content. -->
+
+<!-- ======= INTRODUCTION CARD ======= -->
+<!-- ------------- This card introduces the purpose of the entire application in a friendly, readable way. ------------- -->
+
+<div class="card"> <!-- A card visually groups related content, making the page feel structured and easy to scan. -->
+    <h1>Portfolio Management Decision-Support Web Application with PostgreSQL</h1> <!-- The main heading for the home page, giving users a clear idea of what the project is about the moment they land here. -->
+    <p> <!-- This paragraph explains the purpose of the app in simple terms so even someone unfamiliar with Flask or databases can understand what the project demonstrates. -->
         This Flask application demonstrates a database-backed portfolio management workflow
         using PostgreSQL, Flask-SQLAlchemy, Jinja templates, CSS, and JavaScript.
-    </p>
-</div>
+    </p> <!-- End of the intro paragraph — it sets expectations for what the user will find in the app. -->
+</div> <!-- End of the introduction card. -->
 
-<div class="card">
-    <h2>Main Workflow</h2>
-    <ol>
-        <li>Create client portfolio profiles on the <strong>Portfolio Profiles</strong> page.</li>
-        <li>Select a portfolio and stock on the <strong>Market Dashboard</strong> page.</li>
-        <li>Save analysed stocks into the selected portfolio using database-backed CRUD logic.</li>
-        <li>Review how each portfolio is doing on the <strong>Portfolio Performance</strong> page.</li>
-    </ol>
-</div>
+<!-- ======= WORKFLOW OVERVIEW CARD ======= -->
+<!-- ------------- This card explains the step-by-step workflow users follow when interacting with the app. ------------- -->
 
-<div class="card">
-    <h2>Database Features Demonstrated</h2>
-    <ul>
-        <li><strong>Create:</strong> save new portfolio profiles and holdings.</li>
-        <li><strong>Read:</strong> display profiles, dashboard data, holdings, and contact messages.</li>
-        <li><strong>Update:</strong> update an existing holding when the same ticker is saved again.</li>
-        <li><strong>Delete:</strong> remove saved holdings from a portfolio.</li>
-    </ul>
-</div>
+<div class="card"> <!-- Another card to visually separate the workflow explanation from the intro. -->
+    <h2>Main Workflow</h2> <!-- A subheading that clearly labels this section as the main process users follow. -->
+    <ol> <!-- An ordered list is used because the workflow is sequential — each step builds on the previous one. -->
+        <li>Create client portfolio profiles on the <strong>Portfolio Profiles</strong> page.</li> <!-- Step 1: users define the client and mandate, which is the foundation for all later actions. -->
+        <li>Select a portfolio and stock on the <strong>Market Dashboard</strong> page.</li> <!-- Step 2: users choose which portfolio they want to work with and which stock they want to analyse. -->
+        <li>Save analysed stocks into the selected portfolio using database-backed CRUD logic.</li> <!-- Step 3: users store their analysis results in the database, demonstrating the Create/Update parts of CRUD. -->
+        <li>Review how each portfolio is doing on the <strong>Portfolio Performance</strong> page.</li> <!-- Step 4: users can see how their saved holdings perform, tying together the entire workflow. -->
+    </ol> <!-- End of the ordered workflow list. -->
+</div> <!-- End of the workflow card. -->
 
+<!-- ======= DATABASE FEATURES CARD ======= -->
+<!-- ------------- This card highlights the CRUD operations demonstrated in the project, which is often required in academic assignments. ------------- -->
 
-{% endblock %}
+<div class="card"> <!-- A card to group the database features in a clean, readable way. -->
+    <h2>Database Features Demonstrated</h2> <!-- A subheading that tells the user this section focuses on database functionality. -->
+    <ul> <!-- An unordered list because these are features, not steps. -->
+        <li><strong>Create:</strong> save new portfolio profiles and holdings.</li> <!-- Shows how the app inserts new records into PostgreSQL using SQLAlchemy. -->
+        <li><strong>Read:</strong> display profiles, dashboard data, holdings, and contact messages.</li> <!-- Demonstrates querying the database and rendering results in templates. -->
+        <li><strong>Update:</strong> update an existing holding when the same ticker is saved again.</li> <!-- Shows how the app modifies existing records safely and intelligently. -->
+        <li><strong>Delete:</strong> remove saved holdings from a portfolio.</li> <!-- Demonstrates deleting records and keeping the UI in sync with the database. -->
+    </ul> <!-- End of the features list. -->
+</div> <!-- End of the database features card. -->
+
+{% endblock %} <!-- This closes the content block, signaling that all page-specific content has been defined. -->

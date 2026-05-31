@@ -1,33 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <!-- This declares the document type as HTML5 so the browser knows how to interpret the page; it's a small but important line that helps avoid weird rendering differences between browsers and keeps things predictable for anyone testing the app. -->
+<html lang="en"> <!-- The root element of the page; lang="en" helps browsers and assistive tech (like screen readers) understand the primary language, which is a small accessibility win and also useful for search engines. -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Portfolio Management Decision-Support Web Application{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+<head> <!-- The head contains metadata and links to resources; nothing visible here, but everything inside shapes how the page behaves and looks. -->
+    <meta charset="UTF-8"> <!-- This sets the character encoding to UTF-8 so special characters (like accents or currency symbols) display correctly; always include this early to avoid mysterious mojibake. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- This makes the layout responsive on phones and tablets by telling the browser to match the page width to the device width; without it the site can look tiny or zoomed out on mobile. -->
+    <title>{% block title %}Portfolio Management Decision-Support Web Application{% endblock %}</title> <!-- The title appears in the browser tab and is used by search engines; using a Jinja block lets child templates override the title for each page while keeping a sensible default for the whole app. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- This links the main stylesheet from the static folder; keeping styles in a separate file keeps the HTML clean and makes it easier to iterate on the UI without touching templates. -->
+</head> <!-- End of head; everything that affects page metadata and resources should be above this line. -->
 
-<body>
-    <div class="container">
+<body> <!-- The visible content of the page starts here; this is where templates render the UI that users interact with. -->
+    <div class="container"> <!-- A top-level container that centers and constrains the page content; using a container class is a common pattern so CSS can control spacing and max-width consistently across pages. -->
 
-        {% include '_navbar.html' %}
+        {% include '_navbar.html' %} <!-- This pulls in the navbar partial so the same navigation appears on every page; partials keep templates DRY (don’t repeat yourself) and make maintenance much easier when the nav needs to change. -->
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-area">
-                    {% for category, message in messages %}
-                        <div class="trade-message {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %} <!-- This Jinja block captures flashed messages (like success or error notices) so they can be displayed to the user; flash messages are a friendly way to confirm actions or show validation errors. -->
+            {% if messages %} <!-- Only render the flash area if there are messages to show; this avoids empty UI elements and keeps the page tidy when nothing needs to be communicated. -->
+                <div class="flash-area"> <!-- A dedicated area for flash messages so they can be styled consistently (e.g., green for success, red for error) and appear in a predictable place on every page. -->
+                    {% for category, message in messages %} <!-- Loop through each flashed message; category is typically 'success' or 'error' and helps choose the right visual style. -->
+                        <div class="trade-message {{ category }}">{{ message }}</div> <!-- Each message is wrapped in a div with a class matching its category so CSS can style it appropriately; this makes the feedback clear and accessible to users. -->
+                    {% endfor %} <!-- End of the loop over flashed messages. -->
+                </div> <!-- End of flash-area container. -->
+            {% endif %} <!-- End of conditional that checks for messages. -->
+        {% endwith %} <!-- End of the 'with' block that temporarily stores flashed messages in a variable. -->
 
-        {% block content %}
-        {% endblock %}
+        {% block content %} <!-- This is the main content block that child templates override; it keeps the base layout generic while letting each page inject its own UI. -->
+        {% endblock %} <!-- Closing the content block so child templates know where to insert their markup. -->
 
-    </div>
+    </div> <!-- End of the main container; everything visible on the page should be inside this so layout rules apply consistently. -->
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script> <!-- This loads the main JavaScript file from the static folder; keeping scripts at the end of the body helps the page render faster because the browser can paint the HTML before executing JS. -->
+</body> <!-- End of the visible document body. -->
+</html> <!-- End of the HTML document; a small but satisfying closing tag that marks the end of the template. -->

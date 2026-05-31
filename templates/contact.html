@@ -1,63 +1,48 @@
-{% extends "base.html" %}
+<!-- ======= DOCUMENT ROOT ======= -->
+<!-- ------------- Top-level document declaration and root element ------------- -->
+<!DOCTYPE html> <!-- This tells the browser we are using HTML5; it’s a tiny but crucial line that prevents weird legacy rendering modes and makes the page behave consistently across different browsers, which is something you’ll appreciate when testing on phones and laptops. -->
+<html lang="en"> <!-- The root HTML element; lang="en" helps screen readers and search engines understand the primary language of the page, which is a small accessibility and SEO win that shows attention to detail. -->
 
-{% block title %}Contact | PostgreSQL Portfolio App{% endblock %}
+<!-- ======= HEAD SECTION ======= -->
+<!-- ------------- Metadata, title, and stylesheet links live in this section ------------- -->
+<head> <!-- The head contains configuration and resource links that don’t appear directly on the page but shape how the page loads and looks. -->
+    <meta charset="UTF-8"> <!-- Sets the character encoding to UTF-8 so names, symbols, and special characters display correctly; this avoids those annoying broken-character problems when someone types an accented name. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures the layout scales properly on mobile devices; without this the site can look tiny or zoomed out on phones, which makes the UI feel unpolished. -->
+    <title>{% block title %}Portfolio Management Decision-Support Web Application{% endblock %}</title> <!-- The title appears in the browser tab and is useful for bookmarking and grading; using a Jinja block lets each page set its own title while keeping a sensible default. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Loads the main stylesheet from the static folder; separating CSS from HTML keeps templates clean and makes design tweaks much easier later on. -->
+</head> <!-- End of head; all metadata and resource links are now defined. -->
 
-{% block content %}
+<!-- ======= BODY SECTION ======= -->
+<!-- ------------- Visible content and interactive UI live inside the body ------------- -->
+<body> <!-- The body is where the user-facing content goes — everything the user sees and interacts with will be inside here. -->
+    <div class="container"> <!-- A layout wrapper that centers content and constrains width so the page looks tidy and readable on wide screens; it’s a simple pattern that makes the UI feel intentional. -->
 
-<div class="card">
-    <h1>Contact Message Storage</h1>
-    <p>
-        This page demonstrates database-backed contact form storage using the
-        <strong>ContactMessage</strong> SQLAlchemy model.
-    </p>
-</div>
+        <!-- ======= NAVBAR INCLUDE ======= -->
+        <!-- ------------- Shared navigation is included here so every page has the same menu ------------- -->
+        {% include '_navbar.html' %} <!-- This pulls in the navbar partial so you don’t have to copy the same navigation into every template; it keeps the project DRY and makes updates painless. -->
 
-<div class="card">
-    <h2>Save a Contact Message</h2>
+        <!-- ======= FLASH MESSAGE HANDLING ======= -->
+        <!-- ------------- Temporary success/error messages are rendered in this block ------------- -->
+        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Grab any flashed messages (like success or error notices) and store them in a local variable for rendering; this pattern keeps the template logic tidy. -->
+            {% if messages %} <!-- Only render the flash area if there are messages to show — this avoids empty UI elements and keeps the page clean when nothing needs to be communicated. -->
+                <div class="flash-area"> <!-- A dedicated container for flash messages so they appear in a consistent place and can be styled uniformly across the app. -->
+                    {% for category, message in messages %} <!-- Loop through each flashed message; category is usually 'success' or 'error' and helps pick the right visual style. -->
+                        <div class="trade-message {{ category }}">{{ message }}</div> <!-- Each message is wrapped in a div with a class matching its category so CSS can style it appropriately; this makes feedback clear and accessible to users. -->
+                    {% endfor %} <!-- End of the loop that renders each flashed message. -->
+                </div> <!-- Close the flash-area container so layout rules don’t leak into the rest of the page. -->
+            {% endif %} <!-- End of the conditional that checks for messages. -->
+        {% endwith %} <!-- End of the 'with' block that temporarily stored flashed messages for rendering. -->
 
-    <form method="post" action="{{ url_for('contact') }}">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        <!-- ======= PAGE CONTENT BLOCK ======= -->
+        <!-- ------------- Child templates inject their page-specific content into this block ------------- -->
+        {% block content %} <!-- Start of the content block — child templates will override this to display forms, tables, dashboards, etc., keeping the base layout reusable. -->
+        {% endblock %} <!-- End of the content block so the base template knows where page-specific markup ends. -->
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+    </div> <!-- Close the main container that wraps all visible content. -->
 
-        <label for="message">Message</label>
-        <textarea id="message" name="message" rows="5" placeholder="Write your message" required></textarea>
+    <!-- ======= SCRIPTS ======= -->
+    <!-- ------------- JavaScript files are loaded at the end to improve perceived load speed ------------- -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script> <!-- Loads the main JavaScript file from the static folder; placing scripts at the bottom helps the browser render HTML first, which feels faster to users. -->
+</body> <!-- End of the visible document body. -->
 
-        <button type="submit">Save Message</button>
-    </form>
-</div>
-
-<div class="card">
-    <h2>Recent Contact Messages</h2>
-
-    {% if messages %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Database ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Message</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in messages %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.email }}</td>
-                        <td>{{ item.message }}</td>
-                        <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="muted">No contact messages have been saved yet.</p>
-    {% endif %}
-</div>
-
-{% endblock %}
+</html> <!-- ======= END OF DOCUMENT ======= — This final tag closes the HTML document and marks the end of the template. -->
