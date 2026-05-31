@@ -47,14 +47,14 @@ document.addEventListener("DOMContentLoaded", function () { // This makes sure t
             const summary = data.summary || {}; // This safely stores the summary data, or uses an empty object if no summary is available.
             const summaryBox = document.createElement("div"); // This creates a new div to hold the summary information.
             summaryBox.className = "portfolio-summary"; // This applies the portfolio summary CSS class for styling.
-            summaryBox.innerHTML = ` // This starts the HTML template used to display the portfolio summary information.
+            summaryBox.innerHTML = ` 
                 <p><strong>Positions:</strong> ${summary.position_count ?? 0}</p>
                 <p><strong>Total Allocated:</strong> ${summary.total_allocated_percent ?? 0}%</p>
                 <p><strong>Remaining Cash:</strong> ${summary.remaining_cash_percent ?? 100}%</p>
                 <p><strong>Average Score:</strong> ${summary.average_score ?? "N/A"}</p>
                 <p><strong>Average Beta:</strong> ${summary.average_beta ?? "N/A"}</p>
                 <p><strong>Status:</strong> ${summary.status ?? "N/A"}</p>
-            `; // This ends the summary HTML and uses fallback values where data is missing.
+            `; 
             panel.appendChild(summaryBox); // This adds the summary box inside the accordion panel.
 
             // -------------------- Empty Portfolio Message -------------------- // This subsection shows a message when no holdings have been saved yet.
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () { // This makes sure t
             } else { // This runs when the portfolio does have saved stocks.
                 const table = document.createElement("table"); // This creates a table element to display the saved holdings.
                 table.className = "table"; // This applies the standard table CSS class.
-                table.innerHTML = ` // This starts the table template used to show each saved stock holding.
+                table.innerHTML = ` 
                     <thead>
                         <tr>
                             <th>Ticker</th>
