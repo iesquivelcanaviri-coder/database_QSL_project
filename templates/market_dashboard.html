@@ -1,3 +1,4 @@
+
 <!-- ======= TEMPLATE METADATA ======= -->
 <!-- ------------- Top-level template declaration and title block; this sets up how the page plugs into the base layout and what appears in the browser tab. ------------- -->
 
@@ -182,54 +183,54 @@
     <h2>Yahoo Finance Market Table</h2> <!-- Subheading that names the data source and purpose of the table. -->
 
     <table class="table" id="market-table"> <!-- The table holds the market rows; an id makes it easy for JavaScript to attach sorting and filtering behavior. -->
-        <thead> <!-- Table header defines column names and sorting metadata. -->
-            <tr> <!-- Header row with sortable column definitions via data-sort attributes. -->
-                <th data-sort="ticker">Ticker</th> <!-- Column for ticker symbol; data-sort attribute helps client-side sorting logic. -->
-                <th data-sort="latest_price">Latest Price</th> <!-- Column for the latest market price. -->
-                <th data-sort="expected_return_percent">Expected Return</th> <!-- Column for expected return percentage. -->
-                <th data-sort="score">Score</th> <!-- Column for the analyst score. -->
-                <th data-sort="decision">Decision</th> <!-- Column for the buy/hold/avoid decision. -->
-                <th data-sort="tag">Tag</th> <!-- Column for tag/category (e.g., sector or theme). -->
-                <th data-sort="suggested_weight">Suggested Weight</th> <!-- Column for suggested portfolio weight. -->
-                <th data-sort="volatility">Volatility</th> <!-- Column for volatility percentage. -->
-                <th data-sort="sharpe_like">Sharpe</th> <!-- Column for the Sharpe-like ratio. -->
-                <th data-sort="ranking_score">Ranking Score</th> <!-- Column for the overall ranking score used to sort ideas. -->
-            </tr> <!-- End of the header row. -->
-        </thead> <!-- End of the table header. -->
+        <thead> 
+            <tr> 
+                <th data-sort="ticker">Ticker</th> 
+                <th data-sort="latest_price">Latest Price</th>
+                <th data-sort="expected_return_percent">Expected Return</th> 
+                <th data-sort="score">Score</th> 
+                <th data-sort="decision">Decision</th> 
+                <th data-sort="tag">Tag</th> 
+                <th data-sort="suggested_weight">Suggested Weight</th> 
+                <th data-sort="volatility">Volatility</th> 
+                <th data-sort="sharpe_like">Sharpe</th> 
+                <th data-sort="ranking_score">Ranking Score</th> 
+            </tr> 
+        </thead> 
 
-        <tbody> <!-- Table body where each market row becomes a table row with data attributes for filtering. -->
-            {% for row in rows %} <!-- Loop through each row in the dataset provided by the backend; this keeps the table dynamic and data-driven. -->
+        <tbody> 
+            {% for row in rows %} 
                 <tr
-                    data-ticker="{{ row.ticker }}" <!-- Data attribute for ticker used by filters and JS. -->
-                    data-decision="{{ row.decision }}" <!-- Data attribute for decision category. -->
-                    data-score="{{ row.score if row.score is not none else '' }}" <!-- Data attribute for score; empty string if none to avoid literal 'None' values in HTML. -->
-                    data-volatility="{{ row.volatility if row.volatility is not none else '' }}" <!-- Data attribute for volatility; empty if not available. -->
-                    data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}" <!-- Data attribute for Sharpe-like ratio; empty if not available. -->
-                    data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}" <!-- Data attribute for ranking score; empty if not available. -->
-                    data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}" <!-- Boolean data attribute indicating income candidate status for preset filtering. -->
-                    data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}" <!-- Boolean attribute for low-risk preset. -->
-                    data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}" <!-- Boolean attribute for high-conviction preset. -->
-                    data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}" <!-- Boolean attribute for core-holding preset. -->
-                    data-satellite="{{ 'true' if row.is_satellite else 'false' }}" <!-- Boolean attribute for satellite preset. -->
-                    data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}" <!-- Boolean attribute for exploratory preset. -->
-                    data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}" <!-- Boolean attribute for cash candidate preset. -->
-                    data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}" <!-- Boolean attribute for best-ranked preset. -->
-                    class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" <!-- Conditional class to visually highlight rows based on score thresholds; this helps users spot top ideas quickly. -->
-                > <!-- End of the opening tr tag with many data attributes used by client-side logic. -->
-                    <td>{{ row.ticker }}</td> <!-- Ticker cell — the primary identifier for the security. -->
-                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td> <!-- Latest price cell with fallback to "N/A" if data is missing, which keeps the table readable. -->
-                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td> <!-- Expected return cell with a percent sign appended only when a value exists, so the display is clean and unambiguous. -->
-                    <td>{{ row.score if row.score is not none else "N/A" }}</td> <!-- Score cell with fallback to "N/A" to avoid showing blank or confusing values. -->
-                    <td>{{ row.decision }}</td> <!-- Decision cell showing the analyst recommendation text. -->
-                    <td><span class="tag">{{ row.tag }}</span></td> <!-- Tag cell wrapped in a span for styling; tags help categorize securities visually. -->
-                    <td>{{ row.suggested_weight }}</td> <!-- Suggested weight cell showing the recommended allocation percentage or weight. -->
-                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> <!-- Volatility cell with percent sign appended only when a value exists, keeping the formatting consistent. -->
-                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> <!-- Sharpe-like ratio cell with fallback to "N/A". -->
-                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> <!-- Ranking score cell with fallback to "N/A" so missing data is explicit. -->
-                </tr> <!-- End of the data row for this security. -->
-            {% endfor %} <!-- End of the loop over market rows. -->
-        </tbody> <!-- End of the table body. -->
-    </table> <!-- End of the market table. -->
-</div> <!-- End of the market table card. -->
+                    data-ticker="{{ row.ticker }}" 
+                    data-decision="{{ row.decision }}" 
+                    data-score="{{ row.score if row.score is not none else '' }}" 
+                    data-volatility="{{ row.volatility if row.volatility is not none else '' }}" 
+                    data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}" 
+                    data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}" 
+                    data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}" 
+                    data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}" 
+                    data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}" 
+                    data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}" 
+                    data-satellite="{{ 'true' if row.is_satellite else 'false' }}" 
+                    data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}" 
+                    data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}" 
+                    data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}" 
+                    class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" 
+                > 
+                    <td>{{ row.ticker }}</td> 
+                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td> 
+                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}{% if row.expected_return_percent is not none %}%{% endif %}</td> 
+                    <td>{{ row.score if row.score is not none else "N/A" }}</td> 
+                    <td>{{ row.decision }}</td> 
+                    <td><span class="tag">{{ row.tag }}</span></td> 
+                    <td>{{ row.suggested_weight }}</td> 
+                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> 
+                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> 
+                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> 
+                </tr> 
+            {% endfor %} 
+        </tbody> 
+    </table> 
+</div> 
 
-{% endblock %} <!-- End of the content block — this closes the Market Dashboard’s content so the base template can render the full page. -->
+{% endblock %}
