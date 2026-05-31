@@ -20,11 +20,9 @@ from datetime import datetime  # Used for timestamps and database dates
 import numpy as np             # Used for financial calculations and volatility metrics
 import yfinance as yf          # Used to download live Yahoo Finance market data
 
+
 # Flask imports
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for 
-
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import UniqueConstraint
 
 
 # ============================================================

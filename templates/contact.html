@@ -1,48 +1,75 @@
-<!-- ======= DOCUMENT ROOT ======= -->
-<!-- ------------- Top-level document declaration and root element ------------- -->
-<!DOCTYPE html> <!-- This tells the browser we are using HTML5; it’s a tiny but crucial line that prevents weird legacy rendering modes and makes the page behave consistently across different browsers, which is something you’ll appreciate when testing on phones and laptops. -->
-<html lang="en"> <!-- The root HTML element; lang="en" helps screen readers and search engines understand the primary language of the page, which is a small accessibility and SEO win that shows attention to detail. -->
+<!-- ======= TEMPLATE INHERITANCE SECTION ======= -->
+<!-- ------------- This section tells Jinja which base layout this page should extend, so we don’t repeat the whole HTML skeleton on every page. ------------- -->
+{% extends "base.html" %} <!-- This line connects this page to base.html, meaning all the shared layout (navbar, container, CSS links) comes from that file. It keeps the project clean and avoids repeating the same structure everywhere, which is something students often forget at first. -->
 
-<!-- ======= HEAD SECTION ======= -->
-<!-- ------------- Metadata, title, and stylesheet links live in this section ------------- -->
-<head> <!-- The head contains configuration and resource links that don’t appear directly on the page but shape how the page loads and looks. -->
-    <meta charset="UTF-8"> <!-- Sets the character encoding to UTF-8 so names, symbols, and special characters display correctly; this avoids those annoying broken-character problems when someone types an accented name. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures the layout scales properly on mobile devices; without this the site can look tiny or zoomed out on phones, which makes the UI feel unpolished. -->
-    <title>{% block title %}Portfolio Management Decision-Support Web Application{% endblock %}</title> <!-- The title appears in the browser tab and is useful for bookmarking and grading; using a Jinja block lets each page set its own title while keeping a sensible default. -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Loads the main stylesheet from the static folder; separating CSS from HTML keeps templates clean and makes design tweaks much easier later on. -->
-</head> <!-- End of head; all metadata and resource links are now defined. -->
+<!-- ======= PAGE TITLE SECTION ======= -->
+<!-- ------------- This block sets the title that appears in the browser tab for this specific page. ------------- -->
+{% block title %}Contact | PostgreSQL Portfolio App{% endblock %} <!-- This overrides the title placeholder in base.html so the browser tab clearly shows that this is the Contact page. It’s a small detail but makes the app feel more polished and professional. -->
 
-<!-- ======= BODY SECTION ======= -->
-<!-- ------------- Visible content and interactive UI live inside the body ------------- -->
-<body> <!-- The body is where the user-facing content goes — everything the user sees and interacts with will be inside here. -->
-    <div class="container"> <!-- A layout wrapper that centers content and constrains width so the page looks tidy and readable on wide screens; it’s a simple pattern that makes the UI feel intentional. -->
+<!-- ======= MAIN CONTENT SECTION ======= -->
+<!-- ------------- Everything inside this block becomes the visible content of the page. ------------- -->
+{% block content %} <!-- This opens the content block where all the page-specific HTML will be injected into the base layout. It keeps the structure modular and easy to maintain. -->
 
-        <!-- ======= NAVBAR INCLUDE ======= -->
-        <!-- ------------- Shared navigation is included here so every page has the same menu ------------- -->
-        {% include '_navbar.html' %} <!-- This pulls in the navbar partial so you don’t have to copy the same navigation into every template; it keeps the project DRY and makes updates painless. -->
+<!-- ======= INTRO CARD SECTION ======= -->
+<!-- ------------- This card introduces the purpose of the page and explains what the user can do here. ------------- -->
+<div class="card"> <!-- A card visually groups related content, making the page easier to read and giving it a clean, modern UI feel. -->
+    <h1>Contact Message Storage</h1> <!-- The main heading that tells the user what this page is about — storing contact form submissions in the database. -->
+    <p> <!-- This paragraph explains the purpose of the page in a friendly, human way so users understand what’s happening behind the scenes. -->
+        This page demonstrates database-backed contact form storage using the
+        <strong>ContactMessage</strong> SQLAlchemy model. <!-- Highlighting the model name helps students connect the UI to the backend logic, reinforcing how forms map to database tables. -->
+    </p>
+</div>
 
-        <!-- ======= FLASH MESSAGE HANDLING ======= -->
-        <!-- ------------- Temporary success/error messages are rendered in this block ------------- -->
-        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Grab any flashed messages (like success or error notices) and store them in a local variable for rendering; this pattern keeps the template logic tidy. -->
-            {% if messages %} <!-- Only render the flash area if there are messages to show — this avoids empty UI elements and keeps the page clean when nothing needs to be communicated. -->
-                <div class="flash-area"> <!-- A dedicated container for flash messages so they appear in a consistent place and can be styled uniformly across the app. -->
-                    {% for category, message in messages %} <!-- Loop through each flashed message; category is usually 'success' or 'error' and helps pick the right visual style. -->
-                        <div class="trade-message {{ category }}">{{ message }}</div> <!-- Each message is wrapped in a div with a class matching its category so CSS can style it appropriately; this makes feedback clear and accessible to users. -->
-                    {% endfor %} <!-- End of the loop that renders each flashed message. -->
-                </div> <!-- Close the flash-area container so layout rules don’t leak into the rest of the page. -->
-            {% endif %} <!-- End of the conditional that checks for messages. -->
-        {% endwith %} <!-- End of the 'with' block that temporarily stored flashed messages for rendering. -->
+<!-- ======= CONTACT FORM SECTION ======= -->
+<!-- ------------- This card contains the form where users can submit a new contact message. ------------- -->
+<div class="card"> <!-- Another card to visually separate the form from the rest of the content, making the page feel structured and intentional. -->
+    <h2>Save a Contact Message</h2> <!-- A subheading that clearly labels this section as the place to submit a new message. -->
 
-        <!-- ======= PAGE CONTENT BLOCK ======= -->
-        <!-- ------------- Child templates inject their page-specific content into this block ------------- -->
-        {% block content %} <!-- Start of the content block — child templates will override this to display forms, tables, dashboards, etc., keeping the base layout reusable. -->
-        {% endblock %} <!-- End of the content block so the base template knows where page-specific markup ends. -->
+    <form method="post" action="{{ url_for('contact') }}"> <!-- The form uses POST to send data securely to the /contact route, where the backend will save it to the database. -->
+        <label for="name">Name</label> <!-- Label for the name field, improving accessibility and helping users understand what to enter. -->
+        <input type="text" id="name" name="name" placeholder="Enter your name" required> <!-- A text input for the user's name; 'required' ensures the form cannot be submitted empty, which prevents incomplete database entries. -->
 
-    </div> <!-- Close the main container that wraps all visible content. -->
+        <label for="email">Email</label> <!-- Label for the email field so screen readers and users know what the input is for. -->
+        <input type="email" id="email" name="email" placeholder="Enter your email" required> <!-- Email input with built-in browser validation to ensure the user enters a valid email format. -->
 
-    <!-- ======= SCRIPTS ======= -->
-    <!-- ------------- JavaScript files are loaded at the end to improve perceived load speed ------------- -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script> <!-- Loads the main JavaScript file from the static folder; placing scripts at the bottom helps the browser render HTML first, which feels faster to users. -->
-</body> <!-- End of the visible document body. -->
+        <label for="message">Message</label> <!-- Label for the message textarea, again improving clarity and accessibility. -->
+        <textarea id="message" name="message" rows="5" placeholder="Write your message" required></textarea> <!-- A multi-line text area for the user’s message; 'required' ensures meaningful submissions. -->
 
-</html> <!-- ======= END OF DOCUMENT ======= — This final tag closes the HTML document and marks the end of the template. -->
+        <button type="submit">Save Message</button> <!-- The submit button triggers the POST request to save the message in the database. -->
+    </form>
+</div>
+
+<!-- ======= RECENT MESSAGES SECTION ======= -->
+<!-- ------------- This card displays previously saved messages from the database. ------------- -->
+<div class="card"> <!-- A card to visually group the table of saved messages, making the UI feel organized and easy to scan. -->
+    <h2>Recent Contact Messages</h2> <!-- Subheading that introduces the table of stored messages. -->
+
+    {% if messages %} <!-- This conditional checks whether there are any messages in the database; if not, it shows a friendly fallback message. -->
+        <table class="table"> <!-- A table is the perfect structure for displaying multiple messages in a clean, readable format. -->
+            <thead> <!-- The table header defines the column names so users know what each column represents. -->
+                <tr> <!-- Table header row. -->
+                    <th>Database ID</th> <!-- Shows the unique ID assigned by the database, useful for debugging or admin tasks. -->
+                    <th>Name</th> <!-- Displays the name submitted in the form. -->
+                    <th>Email</th> <!-- Displays the email submitted in the form. -->
+                    <th>Message</th> <!-- Displays the actual message content. -->
+                    <th>Created At</th> <!-- Shows the timestamp when the message was saved, formatted nicely for readability. -->
+                </tr>
+            </thead>
+            <tbody> <!-- The table body will contain one row per saved message. -->
+                {% for item in messages %} <!-- Loop through each message object passed from the backend, dynamically generating table rows. -->
+                    <tr> <!-- A row representing a single saved message. -->
+                        <td>{{ item.id }}</td> <!-- Displays the message's unique database ID. -->
+                        <td>{{ item.name }}</td> <!-- Displays the name the user entered. -->
+                        <td>{{ item.email }}</td> <!-- Displays the email the user entered. -->
+                        <td>{{ item.message }}</td> <!-- Displays the message text itself. -->
+                        <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td> <!-- Formats the timestamp into a human-readable date and time, which feels more polished than raw datetime output. -->
+                    </tr>
+                {% endfor %} <!-- End of the loop that renders each message row. -->
+            </tbody>
+        </table>
+    {% else %} <!-- If there are no messages, show a friendly placeholder instead of an empty table. -->
+        <p class="muted">No contact messages have been saved yet.</p> <!-- A muted message that gently informs the user that the database is currently empty. -->
+    {% endif %}
+</div>
+
+{% endblock %} <!-- End of the content block, signaling that all page-specific content has been defined. -->
