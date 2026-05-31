@@ -1,5 +1,5 @@
 /* ========================================================== */
-/* 1. GLOBAL STYLES                                           */
+/* GLOBAL STYLES                                           */
 /* ========================================================== */
 
 * { /* Universal selector targets every element on the page, which helps me keep spacing and sizing consistent across the whole website */
@@ -33,7 +33,7 @@ p { /* Applies a consistent style to paragraphs throughout the website */
 } 
 
 /* ========================================================== */
-/* 2. NAVBAR                                                  */
+/* NAVBAR                                                  */
 /* ========================================================== */
 
 .navbar { /* Styles the main navigation area containing the website links */
@@ -65,7 +65,7 @@ p { /* Applies a consistent style to paragraphs throughout the website */
 } 
 
 /* ========================================================== */
-/* 3. ACCORDION / COLLAPSIBLE                                 */
+/* ACCORDION / COLLAPSIBLE                                 */
 /* ========================================================== */
 
 .panel li { /* Targets each list item inside an accordion panel */
@@ -118,7 +118,7 @@ p { /* Applies a consistent style to paragraphs throughout the website */
 } 
 
 /* ========================================================== */
-/* 4. FORMS                                                   */
+/*FORMS                                                   */
 /* ========================================================== */
 
 form { /* Targets forms used for inputs such as portfolio and contact details */
@@ -161,7 +161,7 @@ button:hover { /* Hover effect for standard buttons */
 } 
 
 /* ========================================================== */
-/* 5. RESULT BOX                                              */
+/*RESULT BOX                                              */
 /* ========================================================== */
 
 #result-box { /* Main area where portfolio analysis results are displayed */
@@ -196,7 +196,7 @@ button:hover { /* Hover effect for standard buttons */
 }
 
 /* ========================================================== */
-/* 6. CARDS                                                   */
+/*CARDS                                                   */
 /* ========================================================== */
 
 .card { /* Reusable card container used across different pages */
@@ -209,7 +209,7 @@ button:hover { /* Hover effect for standard buttons */
 } 
 
 /* ========================================================== */
-/* 7. TABLES                                                  */
+/*TABLES                                                  */
 /* ========================================================== */
 
 .table { /* Styles tables used to display structured portfolio or holding data */
@@ -221,7 +221,7 @@ button:hover { /* Hover effect for standard buttons */
 } 
 
 /* ========================================================== */
-/* 8. SCORE HEATMAP / TAGS                                    */
+/*SCORE HEATMAP / TAGS                                    */
 /* ========================================================== */
 
 .score-high { /* Used for high-scoring rows or positive results */
@@ -237,7 +237,7 @@ button:hover { /* Hover effect for standard buttons */
 }
 
 /* ========================================================== */
-/* 9. PAGE HELPERS                                            */
+/*PAGE HELPERS                                            */
 /* ========================================================== */
 
 .accordion { /* Styles the accordion button used for expandable helper content */
@@ -274,7 +274,7 @@ button:hover { /* Hover effect for standard buttons */
 }
 
 /* ========================================================== */
-/* 10. RESPONSIVE                                             */
+/*RESPONSIVE                                             */
 /* ========================================================== */
 
 @media (max-width: 48rem) { /* Applies these rules only on screens 768px wide or smaller */
@@ -293,7 +293,7 @@ button:hover { /* Hover effect for standard buttons */
 }
 
 /* ========================================================== */
-/* 11. DATABASE ASSIGNMENT ADDITIONS                          */
+/*DATABASE ASSIGNMENT ADDITIONS                          */
 /* ========================================================== */
 
 .form-grid, /* Styles form grid layouts used for database forms */
