@@ -12,6 +12,7 @@
 import os                      # Used for environment variables and operating system access
 import re                      # Used for regular expression matching and text cleaning
 import time                    # Used for dashboard caching timers
+from copy import deepcopy       # Used to safely preserve existing nested JSON data during profile updates
 from datetime import datetime  # Used for timestamps and database dates
 
 # ------------------------------------------------------------
@@ -697,6 +698,98 @@ def build_profile_data_from_form():  # builds the full JSON profile_data object 
     }
 
         # ------------------------------------------------------------
+        # PROFILE DATA UPDATE HELPERS
+        # ------------------------------------------------------------
+def merge_nested_profile_data(existing_profile, profile_updates):
+    """Merge edited profile fields into the existing JSON profile safely.
+
+    The edit form only displays the most important portfolio-manager fields.
+    This helper keeps older JSON fields that are not shown in the edit form,
+    such as compliance notes, reporting preferences, behavioural information,
+    or other saved profile details.
+    """
+    merged_profile = deepcopy(existing_profile or {})  # Make a safe copy of the existing saved JSON profile.
+
+    for section_name, section_updates in profile_updates.items():  # Loop through each edited section.
+        if isinstance(section_updates, dict):  # Most sections are nested dictionaries.
+            existing_section = merged_profile.get(section_name, {})  # Get the old saved section if it exists.
+
+            if not isinstance(existing_section, dict):  # Protect the app if old data has an unexpected format.
+                existing_section = {}
+
+            existing_section.update(section_updates)  # Update only the edited fields.
+            merged_profile[section_name] = existing_section  # Save the updated section back into the profile.
+        else:
+            merged_profile[section_name] = section_updates  # Replace simple non-dictionary values normally.
+
+    return merged_profile  # Return the updated profile JSON.
+
+
+def build_profile_updates_from_form():
+    """Build only the JSON fields that are available inside the edit form.
+
+    This function is used when editing an existing profile. It avoids deleting
+    optional profile fields that are not shown in the edit form.
+    """
+    client_type = clean_form_value("client_type", "Individual")  # Get the selected client type.
+    display_name = clean_form_value("display_name", "Unnamed Portfolio")  # Use display name as a safe fallback.
+
+    if client_type in ["Corporate", "Family Office", "Trust"]:  # Corporate-style identity details.
+        identity_updates = {
+            "company_name": clean_form_value("client_name", display_name),
+            "entity_type": client_type,
+        }
+    else:  # Individual-style identity details.
+        identity_updates = {
+            "name": clean_form_value("client_name", display_name),
+            "client_type": client_type,
+        }
+
+    return {
+        "identity": identity_updates,
+
+        "objectives": {
+            "goals": clean_form_value("goals", "Balanced growth"),
+            "time_horizon_years": clean_form_value("time_horizon_years", "Not recorded"),
+            "expected_return_percent": clean_form_value("expected_return_percent", "Not recorded"),
+            "benchmark": clean_form_value("benchmark", clean_form_value("benchmark_ticker", "ACWI")),
+        },
+
+        "risk_profile": {
+            "risk_tolerance": clean_form_value("risk_tolerance", "Balanced"),
+            "risk_capacity": clean_form_value("risk_capacity", "Medium"),
+            "max_drawdown_percent": clean_float("max_drawdown_percent", -15),
+        },
+
+        "financials": {
+            "net_worth": clean_float("net_worth", 0),
+            "investments": clean_float("investments", 0),
+            "liabilities": clean_float("liabilities", 0),
+            "liquidity_needs": clean_form_value("liquidity_needs", "Not recorded"),
+        },
+
+        "constraints": {
+            "legal": clean_form_value("legal", "Not recorded"),
+            "esg": clean_form_value("esg", "Not recorded"),
+            "currency": clean_form_value("currency", "Not recorded"),
+            "max_position_weight_percent": clean_float("max_weight", 10),
+        },
+
+        "preferences": {
+            "investment_style": clean_form_value("investment_style", "Not recorded"),
+        },
+
+        "behavioural": {
+            "past_reactions": clean_form_value("past_reactions", "Not recorded"),
+        },
+
+        "mandate": {
+            "type": clean_form_value("mandate_type", "Advisory"),
+            "rebalancing_frequency": clean_form_value("rebalancing_frequency", "Quarterly"),
+            "ips": clean_form_value("ips", "Not recorded"),
+        },
+    }
+        # ------------------------------------------------------------
         # BACKWARD COMPATIBILITY WRAPPER
         # ------------------------------------------------------------
 def make_profile_data(name, client_type, risk_profile, objective, currency, benchmark_ticker, max_weight):
@@ -1224,7 +1317,7 @@ CURRENCY_MAP = {
         # DASHBOARD CACHE CONFIGURATION
         # ------------------------------------------------------------
 dashboard_cache = {"rows": None, "timestamp": 0}  # tiny in-memory cache so we don't hammer Yahoo every time someone opens the dashboard
-DASHBOARD_CACHE_SECONDS = 3600  # cache for 5 minutes — short enough to stay reasonably fresh, long enough to save API calls
+DASHBOARD_CACHE_SECONDS = 3600  # Cache for 1 hour so the dashboard loads faster and avoids unnecessary Yahoo Finance requests.
 
         # ------------------------------------------------------------
         # BATCH METRIC COMPUTATION (used for the dashboard)
@@ -1456,34 +1549,42 @@ def portfolio_profiles():  # This route handles the entire workflow for creating
         # ------------------------------------------------------------
 @app.route("/portfolio_profiles/<int:portfolio_id>/update", methods=["POST"])
 def update_portfolio_profile(portfolio_id):
-    """Update an existing portfolio profile.
+    """Update an existing portfolio profile without deleting older JSON fields.
 
     This route demonstrates the UPDATE part of CRUD for the Portfolio table.
-    It reuses the same simplified questionnaire fields as the Create form.
+    The main database columns are updated directly. The nested profile_data JSON
+    is merged carefully so optional fields that are not shown in the edit form
+    remain stored in PostgreSQL.
     """
-    portfolio = Portfolio.query.get_or_404(portfolio_id)
+    portfolio = Portfolio.query.get_or_404(portfolio_id)  # Load the selected portfolio or return a 404 error.
 
-    display_name = clean_form_value("display_name", "").strip()
-    benchmark_ticker = clean_form_value("benchmark_ticker", portfolio.benchmark_ticker).upper()
-    portfolio_value = clean_float("portfolio_value", portfolio.portfolio_value)
-    max_weight = clean_float("max_weight", portfolio.max_weight)
+    display_name = clean_form_value("display_name", "").strip()  # Read and clean the edited portfolio name.
+    benchmark_ticker = clean_form_value("benchmark_ticker", portfolio.benchmark_ticker).upper()  # Keep ticker format consistent.
+    portfolio_value = clean_float("portfolio_value", portfolio.portfolio_value)  # Read edited portfolio value safely.
+    max_weight = clean_float("max_weight", portfolio.max_weight)  # Read edited max weight safely.
 
-    if not display_name:
+    if not display_name:  # Stop the update if the display name is missing.
         flash("Portfolio name is required before updating.", "error")
         return redirect(url_for("portfolio_profiles"))
 
-    portfolio.display_name = display_name
-    portfolio.benchmark_ticker = benchmark_ticker
-    portfolio.portfolio_value = portfolio_value
-    portfolio.max_weight = max_weight
-    portfolio.profile_data = build_profile_data_from_form()
-    portfolio.updated_at = datetime.utcnow()
+    profile_updates = build_profile_updates_from_form()  # Build only the edited fields from the form.
 
-    db.session.commit()
+    portfolio.display_name = display_name  # Update the visible portfolio name.
+    portfolio.benchmark_ticker = benchmark_ticker  # Update the benchmark ticker.
+    portfolio.portfolio_value = portfolio_value  # Update the mandate value.
+    portfolio.max_weight = max_weight  # Update the maximum holding weight.
+
+    portfolio.profile_data = merge_nested_profile_data(
+        portfolio.profile_data,
+        profile_updates,
+    )  # Merge edited fields into the saved JSON without deleting older hidden fields.
+
+    portfolio.updated_at = datetime.utcnow()  # Store the latest update time.
+
+    db.session.commit()  # Save the edited portfolio to the database.
 
     flash(f"Portfolio profile {portfolio.client_id} was updated successfully.", "success")
     return redirect(url_for("portfolio_profiles"))
-
 
         # ------------------------------------------------------------
         # DELETE PORTFOLIO PROFILE ROUTE
@@ -1510,7 +1611,7 @@ def delete_portfolio_profile(portfolio_id):
         # ------------------------------------------------------------
 @app.route("/market_dashboard")  # This page shows the big market dashboard with all tickers + metrics.
 def market_dashboard():  # Fetches cached rows to avoid re-downloading data every time.
-    rows = get_cached_market_rows()  # Cached for 5 minutes to reduce API load.
+    rows = get_cached_market_rows()  # Cached for 1 hour to reduce API load.
     return render_template(
         "market_dashboard.html",
         active_page="market_dashboard",
