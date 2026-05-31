@@ -1,353 +1,858 @@
+```css
 /* ========================================================== */
-/* GLOBAL STYLES                                           */
-/* ========================================================== */
-
-* { /* Universal selector targets every element on the page, which helps me keep spacing and sizing consistent across the whole website */
-    box-sizing: border-box; /* Makes layout sizing easier because padding and borders are included inside the total width and height of each element */
-} 
-
-body { /* Styles the main body of every page, so this becomes the general visual foundation for the whole portfolio website */
-    font-family: Arial, sans-serif; /* Uses Arial first because it is clean and readable, with sans-serif as a backup if Arial is not available */
-    background: #f4f6f9; /* Gives the page a soft light background so the white content cards stand out clearly */
-    margin: 0; /* Removes default browser margin so I can control the page spacing myself */
-    padding: 0; /* Removes default body padding so the layout starts cleanly from the edges */
-    color: #1a1a1a; /* Sets a dark grey text colour which is readable but softer than pure black */
-    line-height: 1.6; /* Adds more space between lines, making paragraphs easier to read */
-} 
-
-h1, h2, h3, h4 { /* Groups the main heading levels so they all share a consistent professional heading style */
-    color: #1a2b4c; /* Uses a dark navy colour to match the finance-style theme of the web application */
-    margin-top: 0; /* Removes default top spacing so headings align neatly inside cards and sections */
-    margin-bottom: 0.75rem; /* Adds controlled space below headings so the content underneath does not feel cramped */
-} 
-
-p { /* Applies a consistent style to paragraphs throughout the website */
-    margin-top: 0; /* Removes default top paragraph spacing to avoid uneven gaps */
-    margin-bottom: 0.625rem; /* Adds a small amount of space below paragraphs for readability */
-} 
-
-.container { /* Main wrapper used to keep page content centred and not too wide */
-    max-width: 75rem; /* Limits the width so the content does not stretch too much on large screens */
-    margin: auto; /* Centres the container horizontally on the page */
-    padding: clamp(1rem, 3vw, 1.5rem); /* Adds responsive padding that changes slightly depending on screen size */
-} 
-
-/* ========================================================== */
-/* NAVBAR                                                  */
+/* PORTFOLIO MANAGEMENT DECISION-SUPPORT APPLICATION           */
+/* RESPONSIVE FINANCIAL DASHBOARD STYLESHEET                    */
 /* ========================================================== */
 
-.navbar { /* Styles the main navigation area containing the website links */
-    background: #1a2b4c; /* Gives the navbar a dark navy background so it stands out clearly */
-    padding: 0.9375rem clamp(1rem, 4vw, 1.875rem); /* Adds comfortable spacing inside the navbar */
-    display: flex; /* Uses flexbox so the navigation links can sit neatly in a row */
-    gap: clamp(1rem, 2.5vw, 1.875rem); /* Creates responsive space between each navigation link */
-    align-items: center; /* Vertically aligns the links in the middle of the navbar */
-    flex-wrap: wrap; /* Allows links to wrap onto another line on smaller screens */
-    margin-bottom: 1.5rem; /* Adds space below the navbar before the main page content starts */
-    border-radius: 0.5rem; /* Rounds the navbar corners to match the card design */
-} 
-
-.navbar a { /* Styles each link inside the navbar */
-    color: white; /* Makes the links readable against the dark navbar background */
-    text-decoration: none; /* Removes the default underline for a cleaner navigation look */
-    font-weight: bold; /* Makes the navigation links stronger and easier to notice */
-    font-size: 1rem; /* Keeps the link text at a standard readable size */
-    padding-bottom: 0.25rem; /* Leaves space for the active underline */
-    transition: color 0.2s ease, border-color 0.2s ease; /* Makes hover and active changes feel smoother */
-} 
-
-.navbar a:hover { /* Applies when the user hovers over a navbar link */
-    color: #00d4ff; /* Changes the link to cyan to show it is interactive */
-} 
-
-.navbar a.active { /* Styles the link for the page the user is currently viewing */
-    border-bottom: 0.125rem solid #00d4ff; /* Adds a cyan underline to show the active page clearly */
-} 
-
 /* ========================================================== */
-/* ACCORDION / COLLAPSIBLE                                 */
+/* 1. DESIGN VARIABLES                                         */
 /* ========================================================== */
 
-.panel li { /* Targets each list item inside an accordion panel */
-    margin-bottom: 0.375rem; /* Adds small spacing between bullet points so the list is easier to read */
-} 
+:root {
+    --page-bg: #171a1f;
+    --surface: #101214;
+    --surface-soft: #191d22;
+    --surface-raised: #20252b;
+    --surface-hover: #29313a;
 
-.box { /* General content box used to group related page information */
-    border: 0.0625rem solid #d8dee8; /* Adds a subtle border so the box is separated from the background */
-    background: white; /* Uses a white background to make the content look like a clean card */
-    padding: 1.25rem; /* Adds inner spacing so the text does not touch the edges */
-    margin-bottom: 1.875rem; /* Creates space below the box before the next section */
-    border-radius: 0.5rem; /* Rounds the corners for a modern card-style look */
-    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a very light shadow to lift the box slightly from the page */
-} 
+    --nav-bg: #182e55;
+    --nav-bg-light: #203d70;
+    --accent: #00b9d6;
+    --accent-soft: rgba(0, 185, 214, 0.16);
 
-.collapsible-card { /* Outer wrapper for the collapsible section */
-    margin-bottom: 1rem; /* Adds space underneath the collapsible card */
-    border-radius: 0.375rem; /* Rounds the outer corners of the collapsible card */
-    overflow: hidden; /* Keeps the child content inside the rounded corners */
-    background: #11141a; /* Uses a dark background to create contrast from the white page cards */
-    border: 0.0625rem solid #2a2f38; /* Adds a subtle border around the dark card */
-} 
+    --text-primary: #f3f6fb;
+    --text-secondary: #d1d8e4;
+    --text-muted: #9ca8b8;
 
-.collapsible-btn { /* Button that opens and closes the collapsible content */
-    width: 100%; /* Makes the button stretch across the full card width */
-    background: #1a1f27; /* Uses a dark background slightly different from the card for separation */
-    color: #e5e7eb; /* Uses light text so the button label is readable */
-    padding: 0.75rem 1rem; /* Adds comfortable spacing inside the button */
-    text-align: left; /* Aligns the button text to the left like a section heading */
-    font-size: 1.1rem; /* Makes the button label slightly larger than normal text */
-    border: none; /* Removes the browser's default button border */
-    cursor: pointer; /* Shows the user that the button can be clicked */
-    outline: none; /* Removes the default outline, although a custom focus style would be better for accessibility */
-} 
+    --border: #343b45;
+    --border-soft: #29313a;
 
-.collapsible-btn:hover { /* Hover effect for the collapsible button */
-    background: #232933; /* Slightly lightens the button background to show user interaction */
-} 
+    --success-bg: #173b2b;
+    --success-border: #2c8a5c;
+    --success-text: #c8f5db;
 
-.collapsible-content { /* Hidden content area below the collapsible button */
-    display: none; /* Keeps the content hidden until JavaScript opens it */
-    padding: 0.75rem 1rem; /* Adds inner spacing so the content is not pressed against the edge */
-    background: #0d1015; /* Uses a darker background to separate the content from the button */
-    color: #cfd3e0; /* Uses light grey text for readability on the dark background */
-} 
+    --warning-bg: #4a3918;
+    --warning-border: #be8b26;
+    --warning-text: #ffe8ad;
 
-.collapsible-content ul { /* Styles unordered lists inside the collapsible content */
-    margin: 0; /* Removes default list margin so spacing stays controlled */
-    padding-left: 1.25rem; /* Keeps normal bullet indentation for readability */
-} 
+    --danger-bg: #4a1f28;
+    --danger-border: #a83d52;
+    --danger-text: #ffd3db;
 
-/* ========================================================== */
-/*FORMS                                                   */
-/* ========================================================== */
+    --info-bg: #1a3455;
+    --info-border: #3571aa;
+    --info-text: #d4ebff;
 
-form { /* Targets forms used for inputs such as portfolio and contact details */
-    margin-bottom: 1.25rem; /* Adds space below the form so the next section does not sit too close */
-}
+    --radius-small: 0.4rem;
+    --radius-medium: 0.65rem;
+    --radius-large: 0.9rem;
 
-form label { /* Styles labels inside forms */
-    display: block; /* Places each label on its own line above the input */
-    font-weight: bold; /* Makes the label clear and easy to identify */
-    margin-bottom: 0.5rem; /* Adds space between the label and the input below it */
-}
+    --shadow-soft: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.18);
+    --shadow-medium: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.24);
 
-input[type="text"], /* Styles text input fields, such as names or ticker symbols */
-input[type="number"], /* Styles number input fields, such as values, weights, or quantities */
-select { /* Styles dropdown menus so they match the input fields */
-    padding: 0.625rem 0.75rem; /* Adds space inside the control so the text is easier to read */
-    width: 100%; /* Makes the input use the full width available in its container */
-    max-width: 26.25rem; /* Prevents inputs from becoming too wide on large screens */
-    border: 0.0625rem solid #c7cfdb; /* Adds a light border to define the input field */
-    border-radius: 0.375rem; /* Rounds the input corners slightly */
-    margin-bottom: 0.75rem; /* Adds space below each input */
-    background: white; /* Keeps the field background white for clarity */
-    font-size: 0.9375rem; /* Sets a readable input text size */
-}
-
-button { /* Styles all standard buttons unless another class overrides them */
-    padding: 0.625rem 1.125rem; /* Adds spacing inside the button so it looks balanced and is easy to click */
-    background: #1a2b4c; /* Uses the main navy theme colour */
-    color: white; /* Makes the button text readable against the dark background */
-    border: none; /* Removes the default browser border */
-    border-radius: 0.375rem; /* Rounds the button corners */
-    cursor: pointer; /* Shows the user that the button is clickable */
-    font-size: 0.9375rem; /* Uses a clear readable button text size */
-    font-weight: bold; /* Makes the button label stand out */
-    transition: background 0.2s ease; /* Smooths the hover colour change */
-} 
-
-button:hover { /* Hover effect for standard buttons */
-    background: #243a63; /* Slightly lightens the navy colour to show interaction */
-} 
-
-/* ========================================================== */
-/*RESULT BOX                                              */
-/* ========================================================== */
-
-#result-box { /* Main area where portfolio analysis results are displayed */
-    margin-top: 1.25rem; /* Adds space above the result box */
-    background: white; /* Gives results a clean card-style background */
-    padding: 1.25rem; /* Adds space inside the result box */
-    border-radius: 0.5rem; /* Rounds the result box corners */
-    border: 0.0625rem solid #d8dee8; /* Adds a subtle border around the result box */
-    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a light shadow so the result box feels separate from the page */
-} 
-
-.results-grid { /* Creates a two-column layout for displaying result sections side by side */
-    display: grid; /* Uses CSS Grid because it is useful for structured result layouts */
-    grid-template-columns: 1fr 1fr; /* Creates two equal columns for comparison-style result content */
-    gap: 1.25rem; /* Adds space between the two result columns */
-    margin-top: 1.25rem; /* Adds space above the grid so it does not touch the previous result content */
-}
-
-.results-column { /* Styles each individual results column inside the grid */
-    background: #ffffff; /* Keeps each column background white and consistent with the card design */
-    padding: 0.9375rem; /* Adds inner spacing so the result content is readable */
-    border: 0.0625rem solid #dde3eb; /* Adds a light border to separate each results column */
-    border-radius: 0.5rem; /* Rounds the result column corners */
-}
-
-.trade-message { /* Styles the message area used to show feedback after trade actions */
-    margin-top: 1rem; /* Adds space above the message area */
-    padding: 0.75rem 0.875rem; /* Adds comfortable internal spacing */
-    border-radius: 0.375rem; /* Rounds the message box corners */
-    min-height: 1.375rem; /* Gives the message area a minimum height even when the message is short */
-    font-size: 0.875rem; /* Uses a slightly smaller font for status feedback */
+    --content-width: 112rem;
+    --transition: 0.2s ease;
 }
 
 /* ========================================================== */
-/*CARDS                                                   */
+/* 2. GLOBAL RESET AND PAGE FOUNDATION                         */
 /* ========================================================== */
 
-.card { /* Reusable card container used across different pages */
-    background: white; /* Gives the card a clean white background */
-    padding: 1.25rem; /* Adds inner spacing around the card content */
-    border-radius: 0.5rem; /* Rounds the card corners */
-    border: 0.0625rem solid #d8dee8; /* Adds a subtle border around the card */
-    margin-bottom: 1.25rem; /* Adds space below each card */
-    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); /* Adds a soft shadow for depth */
-} 
+* {
+    box-sizing: border-box;
+}
 
-/* ========================================================== */
-/*TABLES                                                  */
-/* ========================================================== */
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
 
-.table { /* Styles tables used to display structured portfolio or holding data */
-    width: 100%; /* Makes the table fill the available container width */
-    border-collapse: collapse; /* Removes double borders between table cells */
-    margin-top: 0.9375rem; /* Adds space above the table */
-    background: white; /* Keeps the table background clean and readable */
-    font-size: 0.875rem; /* Uses a compact but readable table font size */
-} 
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background: var(--page-bg);
+    color: var(--text-primary);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+}
 
-/* ========================================================== */
-/*SCORE HEATMAP / TAGS                                    */
-/* ========================================================== */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
 
-.score-high { /* Used for high-scoring rows or positive results */
-    background-color: #e7f7ed; /* Pale green suggests a strong or positive outcome */
-} 
+a {
+    color: var(--accent);
+    transition: color var(--transition);
+}
 
-.score-medium { /* Used for medium-scoring rows or neutral results */
-    background-color: #fff8e1; /* Pale yellow suggests a middle or cautionary result */
-} 
+a:hover {
+    color: #7cecff;
+}
 
-.score-low { /* Used for low-scoring rows or weaker results */
-    background-color: #fdecec; /* Pale red suggests a weaker or riskier result */
+h1,
+h2,
+h3,
+h4 {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+h1 {
+    font-size: clamp(1.65rem, 2.4vw, 2.6rem);
+}
+
+h2 {
+    font-size: clamp(1.25rem, 1.7vw, 1.8rem);
+}
+
+h3 {
+    font-size: clamp(1.05rem, 1.3vw, 1.35rem);
+}
+
+h4 {
+    font-size: 1.05rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+ul,
+ol {
+    color: var(--text-secondary);
+}
+
+strong {
+    color: var(--text-primary);
+}
+
+.muted {
+    color: var(--text-muted);
 }
 
 /* ========================================================== */
-/*PAGE HELPERS                                            */
+/* 3. RESPONSIVE PAGE CONTAINER                                */
 /* ========================================================== */
 
-.accordion { /* Styles the accordion button used for expandable helper content */
-    width: 100%; /* Makes the accordion stretch across the full container width */
-    background-color: #eef2f7; /* Uses a light blue-grey background to make it look clickable but still subtle */
-    color: #1f2f56; /* Uses dark navy text for readability */
-    cursor: pointer; /* Shows that the accordion can be clicked */
-    padding: 0.625rem 0.875rem; /* Adds spacing inside the accordion button */
-    margin: 0.5rem 0 0 0; /* Adds space above the accordion while keeping other sides controlled */
-    border: 0.0625rem solid #d7deea; /* Adds a light border around the accordion */
-    border-radius: 0.375rem; /* Rounds the accordion button corners */
-    text-align: left; /* Aligns text to the left like a normal section heading */
-    font-weight: 600; /* Makes the accordion title slightly bold */
-    font-size: 0.95rem; /* Sets a readable but compact font size */
-    transition: background-color 0.2s ease; /* Smooths the hover and active background changes */
-}
-
-.accordion:hover { /* Hover state for the accordion button */
-    background-color: #e2e9f3; /* Slightly darkens the background so the user sees it is interactive */
-}
-
-.accordion.active { /* Active state for an opened accordion */
-    background-color: #d9e4f2; /* Uses a stronger background shade to show the accordion is selected or open */
-}
-
-.panel { /* Hidden panel connected to the accordion */
-    display: none; /* Keeps the panel hidden until JavaScript opens it */
-    padding: 0.75rem 0.875rem; /* Adds inner spacing for the panel content */
-    border: 0.0625rem solid #d7deea; /* Adds a border around the panel */
-    border-top: none; /* Removes the top border so the panel joins neatly to the accordion button */
-    border-radius: 0 0 0.375rem 0.375rem; /* Rounds only the bottom corners because the top joins the accordion */
-    background-color: #ffffff; /* Uses a white background for readable panel content */
-    margin-bottom: 0.5rem; /* Adds space below the opened panel */
+.container {
+    width: min(calc(100% - 2rem), var(--content-width));
+    margin: 0 auto;
+    padding: clamp(1rem, 2vw, 2rem) 0 clamp(2rem, 4vw, 4rem);
 }
 
 /* ========================================================== */
-/*RESPONSIVE                                             */
+/* 4. NAVIGATION BAR                                           */
 /* ========================================================== */
 
-@media (max-width: 48rem) { /* Applies these rules only on screens 768px wide or smaller */
-    .container { /* Adjusts the main container on smaller screens */
-        padding: 1rem; /* Reduces padding so more content fits on mobile */
-    } 
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    width: 100%;
+    margin-bottom: clamp(1rem, 2vw, 1.75rem);
+    padding: 0.6rem clamp(0.65rem, 2vw, 1.25rem);
+    overflow-x: auto;
+    background: linear-gradient(135deg, var(--nav-bg), var(--nav-bg-light));
+    border: 0.0625rem solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--shadow-medium);
+    scrollbar-width: thin;
+}
 
-    .navbar { /* Adjusts the navbar on smaller screens */
-        padding: 0.75rem 1rem; /* Makes the navbar more compact */
-        gap: 1rem; /* Reduces the space between links */
-    } 
+.navbar a {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-height: 2.7rem;
+    padding: 0.55rem 0.85rem;
+    border-bottom: 0.15rem solid transparent;
+    border-radius: var(--radius-small);
+    color: #ffffff;
+    font-size: 0.93rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background-color var(--transition),
+        color var(--transition),
+        border-color var(--transition);
+}
 
-    .results-grid { /* Adjusts the results grid on smaller screens */
-        grid-template-columns: 1fr; /* Changes the results layout from two columns to one column for mobile readability */
+.navbar a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.navbar a.active {
+    background: rgba(0, 185, 214, 0.09);
+    border-bottom-color: var(--accent);
+    color: #ffffff;
+}
+
+/* ========================================================== */
+/* 5. CONTENT CARDS AND BOXES                                  */
+/* ========================================================== */
+
+.card,
+.box,
+#result-box {
+    width: 100%;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    padding: clamp(1rem, 2vw, 1.65rem);
+    overflow-x: auto;
+    background: var(--surface);
+    border: 0.0625rem solid var(--border);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--shadow-soft);
+}
+
+.card:hover,
+.box:hover {
+    border-color: #46515f;
+}
+
+.card p:last-child,
+.box p:last-child {
+    margin-bottom: 0;
+}
+
+/* ========================================================== */
+/* 6. FORM COMPONENTS                                         */
+/* ========================================================== */
+
+form {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+form label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0.75rem;
+    padding: 0.72rem 0.8rem;
+    background: #111418;
+    border: 0.0625rem solid #3a424e;
+    border-radius: var(--radius-small);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    transition:
+        border-color var(--transition),
+        background-color var(--transition),
+        box-shadow var(--transition);
+}
+
+textarea {
+    min-height: 7rem;
+    resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #7e8998;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    background: #151a20;
+    border-color: #556170;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    background: #171d24;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem var(--accent-soft);
+}
+
+select option {
+    background: #15191e;
+    color: var(--text-primary);
+}
+
+/* ========================================================== */
+/* 7. RESPONSIVE FORM GRIDS                                    */
+/* ========================================================== */
+
+.form-grid,
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1.15rem);
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.results-column {
+    padding: 1rem;
+    background: var(--surface-soft);
+    border: 0.0625rem solid var(--border);
+    border-radius: var(--radius-medium);
+}
+
+.portfolio-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    padding: 0.85rem;
+    background: var(--surface-soft);
+    border: 0.0625rem solid var(--border-soft);
+    border-radius: var(--radius-small);
+}
+
+.portfolio-summary p {
+    margin-bottom: 0;
+}
+
+/* ========================================================== */
+/* 8. BUTTONS                                                  */
+/* ========================================================== */
+
+button,
+.button,
+input[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.55rem;
+    padding: 0.65rem 1rem;
+    background: var(--nav-bg);
+    border: 0.0625rem solid transparent;
+    border-radius: var(--radius-small);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+}
+
+button:hover,
+.button:hover,
+input[type="submit"]:hover {
+    background: #284b83;
+    border-color: #4b76b6;
+    box-shadow: 0 0.3rem 0.8rem rgba(0, 0, 0, 0.2);
+    transform: translateY(-0.06rem);
+}
+
+button:focus,
+.button:focus,
+input[type="submit"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem var(--accent-soft);
+}
+
+button:active,
+.button:active,
+input[type="submit"]:active {
+    transform: translateY(0);
+}
+
+.filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.85rem 0;
+}
+
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1rem;
+}
+
+.delete-holding-btn {
+    min-height: 2.15rem;
+    padding: 0.45rem 0.75rem;
+    background: #8e293a;
+    font-size: 0.82rem;
+}
+
+.delete-holding-btn:hover {
+    background: #b2344b;
+    border-color: #cf6476;
+}
+
+/* ========================================================== */
+/* 9. TABLES                                                   */
+/* ========================================================== */
+
+.table {
+    width: 100%;
+    min-width: 52rem;
+    margin-top: 0.85rem;
+    overflow: hidden;
+    background: var(--surface);
+    border: 0.0625rem solid var(--border);
+    border-collapse: collapse;
+    border-radius: var(--radius-small);
+    color: var(--text-secondary);
+    font-size: clamp(0.72rem, 0.8vw, 0.9rem);
+}
+
+.table th,
+.table td {
+    padding: 0.62rem 0.7rem;
+    border-bottom: 0.0625rem solid var(--border-soft);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #1d2530;
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.015rem;
+}
+
+.table tbody tr {
+    transition:
+        background-color var(--transition),
+        color var(--transition);
+}
+
+.table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.table tbody tr:hover {
+    background: #242c35;
+    color: #ffffff;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ========================================================== */
+/* 10. FINANCIAL SCORE HEATMAP                                 */
+/* ========================================================== */
+
+.score-high {
+    background: rgba(42, 112, 72, 0.3);
+}
+
+.score-medium {
+    background: rgba(145, 107, 32, 0.24);
+}
+
+.score-low {
+    background: rgba(132, 48, 64, 0.24);
+}
+
+.score-high:hover,
+.score-medium:hover,
+.score-low:hover {
+    background: #2a333d;
+}
+
+/* ========================================================== */
+/* 11. TAGS                                                    */
+/* ========================================================== */
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.48rem;
+    background: rgba(0, 185, 214, 0.12);
+    border: 0.0625rem solid rgba(0, 185, 214, 0.3);
+    border-radius: 99rem;
+    color: #a8f4ff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ========================================================== */
+/* 12. ACCORDIONS                                              */
+/* ========================================================== */
+
+.accordion {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface-raised);
+    border: 0.0625rem solid #424c58;
+    border-radius: var(--radius-small);
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color var(--transition),
+        border-color var(--transition);
+}
+
+.accordion:hover {
+    background: var(--surface-hover);
+    border-color: #566373;
+}
+
+.accordion.active {
+    background: #263746;
+    border-color: #4f778d;
+}
+
+.panel {
+    display: none;
+    width: 100%;
+    margin-bottom: 0.55rem;
+    padding: 0.85rem;
+    overflow-x: auto;
+    background: #14181d;
+    border: 0.0625rem solid #3a444f;
+    border-top: none;
+    border-radius: 0 0 var(--radius-small) var(--radius-small);
+}
+
+.panel li {
+    margin-bottom: 0.35rem;
+}
+
+/* ========================================================== */
+/* 13. COLLAPSIBLE SECTIONS                                    */
+/* ========================================================== */
+
+.collapsible-card {
+    margin-bottom: 0.85rem;
+    overflow: hidden;
+    background: #101317;
+    border: 0.0625rem solid var(--border);
+    border-radius: var(--radius-small);
+}
+
+.collapsible-btn {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    background: #1b2128;
+    border: none;
+    border-radius: 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.collapsible-btn:hover {
+    background: #29313a;
+}
+
+.collapsible-content {
+    display: none;
+    padding: 0.85rem;
+    background: #12161b;
+    color: var(--text-secondary);
+}
+
+.collapsible-content ul {
+    margin: 0;
+    padding-left: 1.3rem;
+}
+
+/* ========================================================== */
+/* 14. STATUS AND FLASH MESSAGES                               */
+/* ========================================================== */
+
+.flash-area {
+    margin-bottom: 1rem;
+}
+
+.trade-message {
+    min-height: 1.2rem;
+    margin-top: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-small);
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+}
+
+.trade-message:empty {
+    display: none;
+}
+
+.trade-message.success,
+.flash-success {
+    background: var(--success-bg);
+    border: 0.0625rem solid var(--success-border);
+    color: var(--success-text);
+}
+
+.trade-message.error,
+.flash-error {
+    background: var(--danger-bg);
+    border: 0.0625rem solid var(--danger-border);
+    color: var(--danger-text);
+}
+
+.trade-message.info,
+.flash-info {
+    background: var(--info-bg);
+    border: 0.0625rem solid var(--info-border);
+    color: var(--info-text);
+}
+
+.trade-message.warning,
+.flash-warning {
+    background: var(--warning-bg);
+    border: 0.0625rem solid var(--warning-border);
+    color: var(--warning-text);
+}
+
+/* ========================================================== */
+/* 15. DESKTOP AND LARGE-SCREEN ENHANCEMENTS                   */
+/* ========================================================== */
+
+@media (min-width: 90rem) {
+    :root {
+        --content-width: 118rem;
+    }
+
+    .container {
+        padding-top: 2rem;
+    }
+
+    .card,
+    .box,
+    #result-box {
+        padding: 1.8rem;
+    }
+
+    .form-grid,
+    .filters-grid {
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    }
+
+    .table th,
+    .table td {
+        padding: 0.72rem 0.8rem;
+    }
+}
+
+@media (min-width: 120rem) {
+    :root {
+        --content-width: 132rem;
+    }
+
+    body {
+        font-size: 1.05rem;
+    }
+
+    .navbar a {
+        font-size: 1rem;
+    }
+
+    .card,
+    .box,
+    #result-box {
+        padding: 2rem;
     }
 }
 
 /* ========================================================== */
-/*DATABASE ASSIGNMENT ADDITIONS                          */
+/* 16. TABLET RESPONSIVENESS                                   */
 /* ========================================================== */
 
-.form-grid, /* Styles form grid layouts used for database forms */
-.filters-grid { /* Styles filter grid layouts used for searching or filtering database records */
-    display: grid; /* Uses grid layout so form fields can align neatly */
-    grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr)); /* Creates responsive columns that automatically wrap depending on screen size */
-    gap: 1rem; /* Adds equal space between grid items */
-    margin-bottom: 1rem; /* Adds space below the form or filter grid */
-}
-
-textarea, /* Styles larger text areas such as contact messages */
-input[type="email"] { /* Styles email input fields */
-    padding: 0.625rem 0.75rem; /* Adds space inside the field for readability */
-    width: 100%; /* Makes the field use the full available width */
-    max-width: 26.25rem; /* Prevents the field from becoming too wide on desktop */
-    border: 0.0625rem solid #c7cfdb; /* Adds a light grey border */
-    border-radius: 0.375rem; /* Rounds the field corners */
-    margin-bottom: 0.75rem; /* Adds spacing below the field */
-    background: white; /* Keeps the field background white */
-    font-size: 0.9375rem; /* Sets a readable font size */
-    font-family: Arial, sans-serif; /* Matches the website font so forms look consistent */
-}
-
-.flash-area { /* Area used for Flask flash messages */
-    margin-bottom: 1rem; /* Adds spacing below flash messages so they do not touch the next section */
-}
-
-.filter-actions { /* Container for filter action buttons */
-    display: flex; /* Uses flexbox so the buttons can sit in a row */
-    flex-wrap: wrap; /* Allows buttons to wrap onto a new line on smaller screens */
-    gap: 0.5rem; /* Adds space between each action button */
-    margin-top: 0.75rem; /* Adds space above the action buttons */
-    margin-bottom: 0.75rem; /* Adds space below the action buttons */
-}
-
-.action-row { /* General row for action buttons or links */
-    margin-top: 1rem; /* Adds space above the action row */
-}
-
-.delete-holding-btn { /* Styles the delete button for portfolio holdings */
-    background: #8b1e2d; /* Uses a dark red colour to show this is a destructive action */
-}
-
-.delete-holding-btn:hover { /* Hover state for the delete holding button */
-    background: #6f1522; /* Darkens the red shade to show hover interaction */
-}
-
-@media (max-width: 48rem) { /* Applies database form adjustments on tablet and mobile screens */
-    .form-grid, /* Targets form grids on smaller screens */
-    .filters-grid { /* Targets filter grids on smaller screens */
-        grid-template-columns: 1fr; /* Changes grids to one column so forms are easier to complete on mobile */
+@media (max-width: 64rem) {
+    .container {
+        width: min(calc(100% - 1.4rem), var(--content-width));
     }
 
-    .filter-actions { /* Adjusts the filter buttons on smaller screens */
-        flex-direction: column; /* Stacks buttons vertically so they are easier to tap */
+    .navbar {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .card,
+    .box,
+    #result-box {
+        padding: 1rem;
+    }
+
+    .table {
+        min-width: 48rem;
     }
 }
+
+/* ========================================================== */
+/* 17. MOBILE RESPONSIVENESS                                   */
+/* ========================================================== */
+
+@media (max-width: 48rem) {
+    body {
+        font-size: 0.95rem;
+    }
+
+    .container {
+        width: min(calc(100% - 1rem), var(--content-width));
+        padding-top: 0.6rem;
+    }
+
+    .navbar {
+        flex-wrap: nowrap;
+        gap: 0.2rem;
+        padding: 0.42rem;
+        border-radius: var(--radius-small);
+    }
+
+    .navbar a {
+        min-height: 2.35rem;
+        padding: 0.46rem 0.62rem;
+        font-size: 0.78rem;
+    }
+
+    .card,
+    .box,
+    #result-box {
+        padding: 0.9rem;
+        border-radius: var(--radius-small);
+    }
+
+    .form-grid,
+    .filters-grid,
+    .results-grid,
+    .portfolio-summary {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+    }
+
+    .filter-actions,
+    .action-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem;
+    }
+
+    .filter-actions button,
+    .action-row button {
+        width: 100%;
+        min-height: 2.5rem;
+        padding: 0.58rem 0.45rem;
+        font-size: 0.78rem;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 1rem;
+    }
+
+    .table {
+        min-width: 44rem;
+        font-size: 0.72rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.48rem 0.55rem;
+    }
+}
+
+/* ========================================================== */
+/* 18. SMALL-PHONE RESPONSIVENESS                              */
+/* ========================================================== */
+
+@media (max-width: 30rem) {
+    .container {
+        width: min(calc(100% - 0.7rem), var(--content-width));
+    }
+
+    h1 {
+        font-size: 1.45rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    h3 {
+        font-size: 1.05rem;
+    }
+
+    .navbar a {
+        padding: 0.42rem 0.52rem;
+        font-size: 0.72rem;
+    }
+
+    .filter-actions,
+    .action-row {
+        grid-template-columns: 1fr;
+    }
+
+    button,
+    .button,
+    input[type="submit"] {
+        width: 100%;
+    }
+
+    .delete-holding-btn {
+        width: auto;
+    }
+}
+
+/* ========================================================== */
+/* 19. ACCESSIBILITY AND REDUCED MOTION                        */
+/* ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+```
