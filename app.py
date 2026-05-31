@@ -24,6 +24,8 @@ import yfinance as yf          # Used to download live Yahoo Finance market data
 # Flask imports
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for 
 
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import UniqueConstraint
 
 # ============================================================
 # APPLICATION CONFIGURATION
