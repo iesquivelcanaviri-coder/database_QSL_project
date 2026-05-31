@@ -1208,11 +1208,23 @@ MASTER_TICKERS = {
         "BITO", "ETHE", "PALL", "PLTM", "URA", "COPX", "WOOD", "HACK", "CIBR", "KWEB"
     ]
 }
+
+        # ------------------------------------------------------------
+        # Currency 
+        # ------------------------------------------------------------
+CURRENCY_MAP = {
+    "EWG": "EUR",
+    "EWQ": "EUR",
+    "EWJ": "JPY",
+    "EWA": "AUD",
+    "EWL": "CHF",
+}
+        
         # ------------------------------------------------------------
         # DASHBOARD CACHE CONFIGURATION
         # ------------------------------------------------------------
 dashboard_cache = {"rows": None, "timestamp": 0}  # tiny in-memory cache so we don't hammer Yahoo every time someone opens the dashboard
-DASHBOARD_CACHE_SECONDS = 300  # cache for 5 minutes — short enough to stay reasonably fresh, long enough to save API calls
+DASHBOARD_CACHE_SECONDS = 3600  # cache for 5 minutes — short enough to stay reasonably fresh, long enough to save API calls
 
         # ------------------------------------------------------------
         # BATCH METRIC COMPUTATION (used for the dashboard)
@@ -1283,18 +1295,6 @@ def build_market_rows():
 
     for ticker in dashboard_tickers:
         metrics_1y = compute_metrics_from_batch(batch_data, ticker)
-        
-        # ------------------------------------------------------------
-        # Currency 
-        # ------------------------------------------------------------
-        CURRENCY_MAP = {
-            "EWG": "EUR",
-            "EWQ": "EUR",
-            "EWJ": "JPY",
-            "EWA": "AUD",
-            "EWL": "CHF",
-        }
-        currency = CURRENCY_MAP.get(ticker, "USD")
         
         
         # Use the same scoring engine as the main analysis page.
