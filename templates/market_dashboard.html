@@ -181,59 +181,60 @@
 
 <div class="card"> <!-- Card wrapper for the market table so it’s visually separated from filters and forms. -->
     <h2>Yahoo Finance Market Table</h2> <!-- Subheading that names the data source and purpose of the table. -->
-
-    <table class="table" id="market-table"> <!-- The table holds the market rows; an id makes it easy for JavaScript to attach sorting and filtering behavior. -->
-        <thead> 
-            <tr> 
-                <th data-sort="ticker">Ticker</th> 
-                <th data-sort="latest_price">Latest Price</th>
-                <th data-sort="currency">Currency</th>
-                <th data-sort="expected_return_percent">Expected Return</th>
-                <th data-sort="score">Score</th> 
-                <th data-sort="decision">Decision</th> 
-                <th data-sort="tag">Tag</th> 
-                <th data-sort="suggested_weight">Suggested Weight</th> 
-                <th data-sort="volatility">Volatility</th> 
-                <th data-sort="sharpe_like">Sharpe</th> 
-                <th data-sort="ranking_score">Ranking Score</th> 
-            </tr> 
-        </thead> 
-
-        <tbody> 
-            {% for row in rows %} 
-                <tr
-                    data-ticker="{{ row.ticker }}" 
-                    data-decision="{{ row.decision }}" 
-                    data-score="{{ row.score if row.score is not none else '' }}" 
-                    data-volatility="{{ row.volatility if row.volatility is not none else '' }}" 
-                    data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}" 
-                    data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}" 
-                    data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}" 
-                    data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}" 
-                    data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}" 
-                    data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}" 
-                    data-satellite="{{ 'true' if row.is_satellite else 'false' }}" 
-                    data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}" 
-                    data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}" 
-                    data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}" 
-                    class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" 
-                > 
-                    <td>{{ row.ticker }}</td> 
-                    <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td>
-                    <td>{{ row.currency if row.currency is not none else "N/A" }}</td>
-                    <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}
-                         {% if row.expected_return_percent is not none %}%{% endif %}</td>
-                    <td>{{ row.score if row.score is not none else "N/A" }}</td> 
-                    <td>{{ row.decision }}</td> 
-                    <td><span class="tag">{{ row.tag }}</span></td> 
-                    <td>{{ row.suggested_weight }}</td> 
-                    <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> 
-                    <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> 
-                    <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> 
+    <div class="table-wrapper">
+        <table class="table" id="market-table"> <!-- The table holds the market rows; an id makes it easy for JavaScript to attach sorting and filtering behavior. -->
+            <thead> 
+                <tr> 
+                    <th data-sort="ticker">Ticker</th> 
+                    <th data-sort="latest_price">Latest Price</th>
+                    <th data-sort="currency">Currency</th>
+                    <th data-sort="expected_return_percent">Expected Return</th>
+                    <th data-sort="score">Score</th> 
+                    <th data-sort="decision">Decision</th> 
+                    <th data-sort="tag">Tag</th> 
+                    <th data-sort="suggested_weight">Suggested Weight</th> 
+                    <th data-sort="volatility">Volatility</th> 
+                    <th data-sort="sharpe_like">Sharpe</th> 
+                    <th data-sort="ranking_score">Ranking Score</th> 
                 </tr> 
-            {% endfor %} 
-        </tbody> 
-    </table> 
+            </thead> 
+
+            <tbody> 
+                {% for row in rows %} 
+                    <tr
+                        data-ticker="{{ row.ticker }}" 
+                        data-decision="{{ row.decision }}" 
+                        data-score="{{ row.score if row.score is not none else '' }}" 
+                        data-volatility="{{ row.volatility if row.volatility is not none else '' }}" 
+                        data-sharpe="{{ row.sharpe_like if row.sharpe_like is not none else '' }}" 
+                        data-ranking="{{ row.ranking_score if row.ranking_score is not none else '' }}" 
+                        data-income-candidate="{{ 'true' if row.is_income_candidate else 'false' }}" 
+                        data-low-risk="{{ 'true' if row.is_low_risk else 'false' }}" 
+                        data-high-conviction="{{ 'true' if row.is_high_conviction else 'false' }}" 
+                        data-core-holding="{{ 'true' if row.is_core_holding else 'false' }}" 
+                        data-satellite="{{ 'true' if row.is_satellite else 'false' }}" 
+                        data-exploratory="{{ 'true' if row.is_exploratory else 'false' }}" 
+                        data-cash-candidate="{{ 'true' if row.is_cash_candidate else 'false' }}" 
+                        data-best-ranked="{{ 'true' if row.is_best_ranked else 'false' }}" 
+                        class="{% if row.score is not none and row.score >= 7 %}score-high{% elif row.score is not none and row.score >= 5 %}score-medium{% elif row.score is not none %}score-low{% endif %}" 
+                    > 
+                        <td>{{ row.ticker }}</td> 
+                        <td>{{ row.latest_price if row.latest_price is not none else "N/A" }}</td>
+                        <td>{{ row.currency if row.currency is not none else "N/A" }}</td>
+                        <td>{{ row.expected_return_percent if row.expected_return_percent is not none else "N/A" }}
+                            {% if row.expected_return_percent is not none %}%{% endif %}</td>
+                        <td>{{ row.score if row.score is not none else "N/A" }}</td> 
+                        <td>{{ row.decision }}</td> 
+                        <td><span class="tag">{{ row.tag }}</span></td> 
+                        <td>{{ row.suggested_weight }}</td> 
+                        <td>{{ row.volatility if row.volatility is not none else "N/A" }}{% if row.volatility is not none %}%{% endif %}</td> 
+                        <td>{{ row.sharpe_like if row.sharpe_like is not none else "N/A" }}</td> 
+                        <td>{{ row.ranking_score if row.ranking_score is not none else "N/A" }}</td> 
+                    </tr> 
+                {% endfor %} 
+            </tbody> 
+        </table> 
+    </div> 
 </div> 
 
 {% endblock %}

@@ -28,50 +28,51 @@ Portfolio Performance | PostgreSQL Portfolio App <!-- This is the text that will
 
 <div class="card"> <!-- Card for the summary table so the overview metrics are grouped and easy to find. -->
     <h2>Portfolio Performance Summary</h2> <!-- Subheading that labels the summary section so users know the table below is an at-a-glance comparison. -->
+    <div class="table-wrapper">
+        <table class="table"> <!-- Table to present portfolio-level metrics in a structured, comparable format — tables are ideal for side-by-side comparisons. -->
+            <thead> <!-- Table header defines column names so the data is easy to interpret. -->
+                <tr> <!-- Header row containing column titles. -->
+                    <th>Portfolio</th> <!-- Column for the portfolio name so readers can identify which row belongs to which client or mandate. -->
+                    <th>Benchmark</th> <!-- Column for the benchmark ticker used to compare performance. -->
+                    <th>Positions</th> <!-- Column showing how many holdings are in the portfolio — a quick proxy for diversification. -->
+                    <th>Total Allocated</th> <!-- Column for the total percent allocated to holdings, useful to spot under- or over-allocation. -->
+                    <th>Remaining Cash</th> <!-- Column for cash left in the portfolio, which indicates room to deploy capital or a defensive stance. -->
+                    <th>Average Score</th> <!-- Column for the average analyst score across holdings — a simple quality metric. -->
+                    <th>Average Return</th> <!-- Column for the average expected return across holdings — helps compare return potential. -->
+                    <th>Average Volatility</th> <!-- Column for average volatility — risk context for the portfolio. -->
+                    <th>Average Beta</th> <!-- Column for average beta — shows sensitivity to market movements. -->
+                    <th>Status</th> <!-- Column for a human-readable status that summarizes the portfolio health. -->
+                </tr> <!-- End of the header row. -->
+            </thead> <!-- End of the table header. -->
 
-    <table class="table"> <!-- Table to present portfolio-level metrics in a structured, comparable format — tables are ideal for side-by-side comparisons. -->
-        <thead> <!-- Table header defines column names so the data is easy to interpret. -->
-            <tr> <!-- Header row containing column titles. -->
-                <th>Portfolio</th> <!-- Column for the portfolio name so readers can identify which row belongs to which client or mandate. -->
-                <th>Benchmark</th> <!-- Column for the benchmark ticker used to compare performance. -->
-                <th>Positions</th> <!-- Column showing how many holdings are in the portfolio — a quick proxy for diversification. -->
-                <th>Total Allocated</th> <!-- Column for the total percent allocated to holdings, useful to spot under- or over-allocation. -->
-                <th>Remaining Cash</th> <!-- Column for cash left in the portfolio, which indicates room to deploy capital or a defensive stance. -->
-                <th>Average Score</th> <!-- Column for the average analyst score across holdings — a simple quality metric. -->
-                <th>Average Return</th> <!-- Column for the average expected return across holdings — helps compare return potential. -->
-                <th>Average Volatility</th> <!-- Column for average volatility — risk context for the portfolio. -->
-                <th>Average Beta</th> <!-- Column for average beta — shows sensitivity to market movements. -->
-                <th>Status</th> <!-- Column for a human-readable status that summarizes the portfolio health. -->
-            </tr> <!-- End of the header row. -->
-        </thead> <!-- End of the table header. -->
-
-        <tbody> <!-- Table body where each portfolio summary becomes a row. -->
-            {% for row in performance_rows %} <!-- Loop through performance_rows provided by the backend so the table reflects current database state. -->
-                <tr class="{% if row.status == 'Performing well' %}score-high{% elif row.status == 'Mixed / monitor' %}score-medium{% elif row.status == 'Weak / needs review' %}score-low{% endif %}"> <!-- Conditional class to visually highlight rows based on status; this helps users spot strong or weak portfolios at a glance. -->
-                    <td>{{ row.portfolio_name }}</td> <!-- Portfolio name cell — the primary identifier for the row. -->
-                    <td>{{ row.benchmark_ticker }}</td> <!-- Benchmark ticker cell — useful for context and comparison. -->
-                    <td>{{ row.position_count }}</td> <!-- Number of positions cell — quick indicator of diversification. -->
-                    <td>{{ row.total_allocated_percent }}%</td> <!-- Total allocated percent with a percent sign appended so the value is immediately understandable. -->
-                    <td>{{ row.remaining_cash_percent }}%</td> <!-- Remaining cash percent with percent sign to show liquidity or uninvested capital. -->
-                    <td>{{ row.average_score if row.average_score is not none else "N/A" }}</td> <!-- Average score with fallback to "N/A" to avoid showing blank or confusing values. -->
-                    <td> <!-- Average expected return cell with conditional percent sign for clarity. -->
-                        {{ row.average_expected_return if row.average_expected_return is not none else "N/A" }}
-                        {% if row.average_expected_return is not none %}%{% endif %}
-                    </td> <!-- End of average expected return cell. -->
-                    <td> <!-- Average volatility cell with conditional percent sign so formatting is consistent and clear. -->
-                        {{ row.average_volatility if row.average_volatility is not none else "N/A" }}
-                        {% if row.average_volatility is not none %}%{% endif %}
-                    </td> <!-- End of average volatility cell. -->
-                    <td>{{ row.average_beta if row.average_beta is not none else "N/A" }}</td> <!-- Average beta cell with fallback to "N/A" to indicate missing data explicitly. -->
-                    <td><strong>{{ row.status }}</strong></td> <!-- Status cell emphasized with <strong> so the portfolio health stands out visually. -->
-                </tr> <!-- End of the portfolio summary row. -->
-            {% else %} <!-- If the loop finds no rows, render a friendly placeholder so the table doesn’t look broken or empty. -->
-                <tr> <!-- Placeholder row when there is no performance data. -->
-                    <td colspan="10">No portfolio performance data is available yet.</td> <!-- A single cell spanning all columns that explains the absence of data in plain language. -->
-                </tr> <!-- End of the placeholder row. -->
-            {% endfor %} <!-- End of the loop over performance_rows. -->
-        </tbody> <!-- End of the table body. -->
-    </table> <!-- End of the summary table. -->
+            <tbody> <!-- Table body where each portfolio summary becomes a row. -->
+                {% for row in performance_rows %} <!-- Loop through performance_rows provided by the backend so the table reflects current database state. -->
+                    <tr class="{% if row.status == 'Performing well' %}score-high{% elif row.status == 'Mixed / monitor' %}score-medium{% elif row.status == 'Weak / needs review' %}score-low{% endif %}"> <!-- Conditional class to visually highlight rows based on status; this helps users spot strong or weak portfolios at a glance. -->
+                        <td>{{ row.portfolio_name }}</td> <!-- Portfolio name cell — the primary identifier for the row. -->
+                        <td>{{ row.benchmark_ticker }}</td> <!-- Benchmark ticker cell — useful for context and comparison. -->
+                        <td>{{ row.position_count }}</td> <!-- Number of positions cell — quick indicator of diversification. -->
+                        <td>{{ row.total_allocated_percent }}%</td> <!-- Total allocated percent with a percent sign appended so the value is immediately understandable. -->
+                        <td>{{ row.remaining_cash_percent }}%</td> <!-- Remaining cash percent with percent sign to show liquidity or uninvested capital. -->
+                        <td>{{ row.average_score if row.average_score is not none else "N/A" }}</td> <!-- Average score with fallback to "N/A" to avoid showing blank or confusing values. -->
+                        <td> <!-- Average expected return cell with conditional percent sign for clarity. -->
+                            {{ row.average_expected_return if row.average_expected_return is not none else "N/A" }}
+                            {% if row.average_expected_return is not none %}%{% endif %}
+                        </td> <!-- End of average expected return cell. -->
+                        <td> <!-- Average volatility cell with conditional percent sign so formatting is consistent and clear. -->
+                            {{ row.average_volatility if row.average_volatility is not none else "N/A" }}
+                            {% if row.average_volatility is not none %}%{% endif %}
+                        </td> <!-- End of average volatility cell. -->
+                        <td>{{ row.average_beta if row.average_beta is not none else "N/A" }}</td> <!-- Average beta cell with fallback to "N/A" to indicate missing data explicitly. -->
+                        <td><strong>{{ row.status }}</strong></td> <!-- Status cell emphasized with <strong> so the portfolio health stands out visually. -->
+                    </tr> <!-- End of the portfolio summary row. -->
+                {% else %} <!-- If the loop finds no rows, render a friendly placeholder so the table doesn’t look broken or empty. -->
+                    <tr> <!-- Placeholder row when there is no performance data. -->
+                        <td colspan="10">No portfolio performance data is available yet.</td> <!-- A single cell spanning all columns that explains the absence of data in plain language. -->
+                    </tr> <!-- End of the placeholder row. -->
+                {% endfor %} <!-- End of the loop over performance_rows. -->
+            </tbody> <!-- End of the table body. -->
+        </table> <!-- End of the summary table. -->
+    </div> <!-- End of the table wrapper which can be used to add scroll or responsive behavior if needed. -->
 </div> <!-- End of the portfolio performance summary card. -->
 
 <div class="card"> <!-- Card for the interpretation guide so users can translate metrics into actions. -->

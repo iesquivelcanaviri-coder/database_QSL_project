@@ -45,28 +45,30 @@
     <h2>Recent Contact Messages</h2> <!-- Subheading that introduces the table of stored messages. -->
 
     {% if messages %} <!-- This conditional checks whether there are any messages in the database; if not, it shows a friendly fallback message. -->
-        <table class="table"> <!-- A table is the perfect structure for displaying multiple messages in a clean, readable format. -->
-            <thead> <!-- The table header defines the column names so users know what each column represents. -->
-                <tr> <!-- Table header row. -->
-                    <th>Database ID</th> <!-- Shows the unique ID assigned by the database, useful for debugging or admin tasks. -->
-                    <th>Name</th> <!-- Displays the name submitted in the form. -->
-                    <th>Email</th> <!-- Displays the email submitted in the form. -->
-                    <th>Message</th> <!-- Displays the actual message content. -->
-                    <th>Created At</th> <!-- Shows the timestamp when the message was saved, formatted nicely for readability. -->
-                </tr>
-            </thead>
-            <tbody> <!-- The table body will contain one row per saved message. -->
-                {% for item in messages %} <!-- Loop through each message object passed from the backend, dynamically generating table rows. -->
-                    <tr> <!-- A row representing a single saved message. -->
-                        <td>{{ item.id }}</td> <!-- Displays the message's unique database ID. -->
-                        <td>{{ item.name }}</td> <!-- Displays the name the user entered. -->
-                        <td>{{ item.email }}</td> <!-- Displays the email the user entered. -->
-                        <td>{{ item.message }}</td> <!-- Displays the message text itself. -->
-                        <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td> <!-- Formats the timestamp into a human-readable date and time, which feels more polished than raw datetime output. -->
+        <div class="table-wrapper">
+            <table class="table"> <!-- A table is the perfect structure for displaying multiple messages in a clean, readable format. -->
+                <thead> <!-- The table header defines the column names so users know what each column represents. -->
+                    <tr> <!-- Table header row. -->
+                        <th>Database ID</th> <!-- Shows the unique ID assigned by the database, useful for debugging or admin tasks. -->
+                        <th>Name</th> <!-- Displays the name submitted in the form. -->
+                        <th>Email</th> <!-- Displays the email submitted in the form. -->
+                        <th>Message</th> <!-- Displays the actual message content. -->
+                        <th>Created At</th> <!-- Shows the timestamp when the message was saved, formatted nicely for readability. -->
                     </tr>
-                {% endfor %} <!-- End of the loop that renders each message row. -->
-            </tbody>
-        </table>
+                </thead>
+                <tbody> <!-- The table body will contain one row per saved message. -->
+                    {% for item in messages %} <!-- Loop through each message object passed from the backend, dynamically generating table rows. -->
+                        <tr> <!-- A row representing a single saved message. -->
+                            <td>{{ item.id }}</td> <!-- Displays the message's unique database ID. -->
+                            <td>{{ item.name }}</td> <!-- Displays the name the user entered. -->
+                            <td>{{ item.email }}</td> <!-- Displays the email the user entered. -->
+                            <td>{{ item.message }}</td> <!-- Displays the message text itself. -->
+                            <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td> <!-- Formats the timestamp into a human-readable date and time, which feels more polished than raw datetime output. -->
+                        </tr>
+                    {% endfor %} <!-- End of the loop that renders each message row. -->
+                </tbody>
+            </table>
+         </div>
     {% else %} <!-- If there are no messages, show a friendly placeholder instead of an empty table. -->
         <p class="muted">No contact messages have been saved yet.</p> <!-- A muted message that gently informs the user that the database is currently empty. -->
     {% endif %}
