@@ -221,6 +221,16 @@ button:hover { /* Hover effect for standard buttons */
 } 
 
 /* ========================================================== */
+/* RESPONSIVE TABLE WRAPPER                               */
+/* ========================================================== */
+
+.table-wrapper { /* Allows wide financial tables to remain usable on tablets and mobile phones */
+    width: 100%; /* Keeps the wrapper aligned with its parent card */
+    overflow-x: auto; /* Adds horizontal scrolling when the table is wider than the screen */
+    -webkit-overflow-scrolling: touch; /* Makes scrolling smoother on supported mobile browsers */
+}
+
+/* ========================================================== */
 /*SCORE HEATMAP / TAGS                                    */
 /* ========================================================== */
 
@@ -350,4 +360,17 @@ input[type="email"] { /* Styles email input fields */
     .filter-actions { /* Adjusts the filter buttons on smaller screens */
         flex-direction: column; /* Stacks buttons vertically so they are easier to tap */
     }
+}
+
+/* ========================================================== */
+/* ACCESSIBILITY FOCUS STATES                             */
+/* ========================================================== */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible { /* Gives keyboard users a visible indicator when navigating interactive elements */
+    outline: 0.1875rem solid #00d4ff; /* Uses the cyan accent so focus is clearly visible */
+    outline-offset: 0.1875rem; /* Adds space between the focused element and the outline */
 }
