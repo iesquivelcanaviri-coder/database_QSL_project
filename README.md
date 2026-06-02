@@ -292,6 +292,7 @@ portfolio-database-project/
 ├── README.md
 ├── .env.example
 ├── .gitignore
+├── database_migration_distinction_update
 ├── static/
 │   ├── css/
 │   │   └── style.css
