@@ -48,6 +48,7 @@ The application simulates a professional portfolio management workflow where por
 * manage portfolio holdings
 * save and update portfolio allocations
 * store client contact messages
+* modify client contact messages
 * persist all records inside a PostgreSQL database
 
 The project demonstrates full-stack web development concepts including backend Flask development, PostgreSQL database integration, CRUD operations, frontend JavaScript interactivity, responsive CSS design, and cloud deployment.
